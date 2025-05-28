@@ -175,11 +175,11 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-tourSchema.post(/^find/, function (docs, next) {
-  this.end = Date.now();
-  console.log(`Query took ${this.end - this.start} milliseconds `);
-  next();
-});
+// tourSchema.post(/^find/, function (docs, next) {
+//   this.end = Date.now();
+//   console.log(`Query took ${this.end - this.start} milliseconds `);
+//   next();
+// });
 
 tourSchema.pre(/^find/, function(next) {
   this.populate({

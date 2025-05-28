@@ -25,7 +25,6 @@ async function startServer(mongoUri, port = process.env.PORT || 3000) {
   });
 
   server = app.listen(port, () => {
-    console.log(`App running on port ${port}...`);
   });
 
   return server;

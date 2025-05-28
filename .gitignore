@@ -22,12 +22,12 @@ jest-cache/
 jest-worker/
 
 # Parcel bundler cache/output
-.cache
+.cache/
 dist/
 public/js/bundle.js
 
 # Environment variables
-.env
+*.env
 config.env
 
 # MongoDB memory server data
