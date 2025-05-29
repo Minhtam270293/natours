@@ -4,7 +4,9 @@
   "description": "Leaning node, express and mongoDB",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+
     "start:prod": "cross-env NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
@@ -81,5 +83,8 @@
     "superagent": "^10.2.1",
     "supertest": "^7.1.1",
     "testcontainers": "^10.28.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   }
 }
