@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-const signUp = async (name, email, password, passwordConfirm) => {
+const signup = async (name, email, password, passwordConfirm) => {
   try {
     const res = await axios({
       method: 'POST',

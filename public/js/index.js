@@ -33,13 +33,12 @@ if (loginForm)
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
 
 if (signupForm)
-  signupForm.addEventListener('click', e => {
+  signupForm.addEventListener('submit', e => {
     e.preventDefault();
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password-confirm').value;
-
     signup(name, email, password, passwordConfirm);
   });
 
