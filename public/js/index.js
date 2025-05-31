@@ -9,6 +9,7 @@
 // const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
+const signupForm = document.querySelector('.form--signup');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 
@@ -19,6 +20,8 @@ const userPasswordForm = document.querySelector('.form-user-password');
 //   displayMap(locations);
 // }
 
+
+
 if (loginForm)
   loginForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -28,6 +31,17 @@ if (loginForm)
   });
 
 if (logOutBtn) logOutBtn.addEventListener('click', logout);
+
+if (signupForm)
+  signupForm.addEventListener('click', e => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+
+    signup(name, email, password, passwordConfirm);
+  });
 
 if (userDataForm)
   userDataForm.addEventListener('submit', e => {
