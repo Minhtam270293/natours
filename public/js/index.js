@@ -12,6 +12,7 @@ const logOutBtn = document.querySelector('.nav__el--logout');
 const signupForm = document.querySelector('.form--signup');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const addToCartButton = document.querySelector('.add-to-cart');
 
 // DELEGATION
 
@@ -20,7 +21,13 @@ const userPasswordForm = document.querySelector('.form-user-password');
 //   displayMap(locations);
 // }
 
-
+ if (addToCartButton) {
+    addToCartButton.addEventListener('click', function () {
+      const tourId = this.dataset.id;
+      addCart(tourId, 1);
+      // console.log(tourId);
+    });
+  };
 
 if (loginForm)
   loginForm.addEventListener('submit', e => {

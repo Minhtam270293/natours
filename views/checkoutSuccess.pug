@@ -1,0 +1,13 @@
+extends base
+
+block content
+  main.main
+    .error
+      .error__title
+        h2.heading-secondary.heading-secondary--error Thank you for your booking!   
+        h2.error__emoji 🎉🎉
+      .error__msg= msg
+      a.button(href='/my-bookings') Go to my bookings
+  
+block scripts
+  script(src='/js/handleCartSuccess.js')

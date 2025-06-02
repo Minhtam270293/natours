@@ -8,6 +8,8 @@ router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
 router.get('/login', authController.isLoggedIn, viewsController.getLoginForm);
 router.get('/signup', viewsController.getSignUpForm);
 router.get('/me', authController.protect, viewsController.getAccount);
+router.get('/cart', authController.isLoggedIn, viewsController.viewCart)
+router.get('/cart/success', authController.isLoggedIn, viewsController.viewCheckoutSuccess)
 
 router.post(
   '/submit-user-data',

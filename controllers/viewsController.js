@@ -40,6 +40,21 @@ exports.getLoginForm = (req, res) => {
   });
 };
 
+exports.viewCart = (req, res) => {
+
+  res.locals.cart = req.session.cart.getCart();
+
+  res.status(200).render('cart', {
+    title: 'Cart details',
+  });
+};
+
+exports.viewCheckoutSuccess = (req, res) => {
+  res.status(200).render('checkoutSuccess', {
+    title: 'Cheking out successfully'
+  })
+}
+
 exports.getSignUpForm = (req, res) => {
   res.status(200).render('signup', {
     title: 'Create an account'

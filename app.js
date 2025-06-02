@@ -8,12 +8,14 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const session = require('express-session');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const cartRouter = require('./routes/cartRoutes');
 const viewRouter = require('./routes/viewRoutes')
 
 const app = express();
@@ -27,13 +29,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set security HTTP headers
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      formAction: ["'self'", 'https://checkout.stripe.com', 'http://127.0.0.1:3000']
+    }
+  })
+);
 
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 } else if (process.env.NODE_ENV === 'production') {
+
 }
 
 // Limit requests from same API
@@ -50,6 +60,7 @@ app.use('/api' , limiter);
 
 // Body parser, reading data from the body into req.body
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
@@ -72,6 +83,17 @@ app.use(hpp({
 
 app.use(compression());
 
+// Session config
+app.use(session({
+  secret: 'Secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 20 * 60 * 1000 // 20p
+  }
+}))
+
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -79,12 +101,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// Initialize cart
+app.use((req, res, next) => {
+  let Cart = require('./controllers/cart');
+  req.session.cart = new Cart(req.session.cart ? req.session.cart : {});
+  res.locals.quantity = req.session.cart.quantity;
+
+  next();
+}) 
+
 // 3) ROUTES
 
 app.use('/', viewRouter)
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/carts', cartRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
