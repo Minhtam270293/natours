@@ -1332,3 +1332,22 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+.nav__cart {
+  gap: 0.5rem; /* small space between icon and number */
+  cursor: pointer; /* reinforce pointer */
+}
+
+.nav__cart:hover {
+  /* Use the same hover effect as .nav__el but only once */
+  text-shadow: 0 0.7rem 1rem black;
+  transform: translateY(-2px);
+}
+
+.icon--cart {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 0px;
+  filter: brightness(0) invert(1);
+}
