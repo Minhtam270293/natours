@@ -1,21 +1,60 @@
 extends base
 
+//- block content
+//-   h2 Your Cart
+
+//-   if cart.items.length
+//-     table.table
+//-       thead
+//-         tr
+//-           th Image
+//-           th Name
+//-           th Price
+//-           th Remove
+//-       tbody
+//-         each item in cart.items
+//-           tr
+//-             td 
+//-               img(src=`/img/tours/${item.product.imageCover}`, alt='tour image', width='100')
+//-             td= item.product.name
+//-             td $#{item.product.price}
+//-             td
+//-               form(method='POST', action='api/v1/carts/remove')
+//-                 input(type='hidden', name='id', value=item.product._id)
+//-                 button(type='submit').btn.btn--small.btn--danger
+//-                   i.fas.fa-trash
+
+//-     .cart-summary
+//-       p Subtotal: $#{cart.subtotal}
+//-       p Coupon: $#{cart.discount}
+//-       p.grand-total Grand Total: $#{cart.total}
+
+//-     form(method='POST', action='api/v1/carts/clear')
+//-       button.btn.btn--small.btn--danger(type='submit') Clear Cart
+
+//-     form(method='POST', action='api/v1/users/checkout')
+//-       button.btn.btn--small.btn--green(type='submit') Pay with Stripe
+
+//-   else
+//-     p Your cart is empty.
+
+
+
 block content
-  h2 Your Cart
 
   if cart.items.length
-    table.table
+    table.cart-table
       thead
         tr
-          th Image
+          th Tour image
           th Name
           th Price
-          th Remove
+          th Remove tour
       tbody
         each item in cart.items
           tr
             td 
-              img(src=`/img/tours/${item.product.imageCover}`, alt='tour image', width='100')
+              img.cart-image(src=`/img/tours/${item.product.imageCover}`, alt='tour image')
             td= item.product.name
             td $#{item.product.price}
             td
@@ -29,11 +68,13 @@ block content
       p Coupon: $#{cart.discount}
       p.grand-total Grand Total: $#{cart.total}
 
-    form(method='POST', action='api/v1/carts/clear')
-      button.btn.btn--small.btn--danger(type='submit') Clear Cart
+    .cart-actions
+      form(method='POST', action='api/v1/carts/clear')
+        button.btn.btn--small.btn--danger(type='submit') Clear Cart
 
-    form(method='POST', action='api/v1/users/checkout')
-      button.btn.btn--small.btn--green(type='submit') Pay with Stripe
+      form(method='POST', action='api/v1/users/checkout')
+        button.btn.btn--small.btn--green(type='submit') Pay with Stripe
 
   else
-    p Your cart is empty.
+    h2 YOUR CART IS EMPTY
+
