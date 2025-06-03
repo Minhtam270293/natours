@@ -9,12 +9,17 @@ let controller = {};
 
 controller.add = async (req, res, next) => {
     const id = req.body.id;
-    const quantity = isNaN(req.body.quantity) ? 0 : parseInt(req.body.quantity);
+    const orderSize = isNaN(req.body.orderSize) ? 1 : parseInt(req.body.orderSize);
 
     try {
-        const tour = await Tour.findById(id); // Now this works for ObjectId strings
+        const tour = await Tour.findById(id);
         if (tour) {
-            req.session.cart.add(tour, quantity);
+
+          if(req.session.cart.items[tour._id]) {
+            return res.status(400).json({ message: 'Tour already in cart'})
+          }
+
+            req.session.cart.addTour(tour, orderSize);
             return res.json({ quantity: req.session.cart.quantity });
         } else {
             return res.status(404).json({ message: 'Tour not found' });
@@ -46,12 +51,12 @@ controller.checkout = async (req, res) => {
     price_data: {
       currency: 'usd',
       product_data: {
-        name: item.product.name,
-        images: [`${req.protocol}://${req.get('host')}/img/tours/${item.product.imageCover}`],
+        name: item.tour.name,
+        images: [`https://natours.dev/img/tours/${item.tour.imageCover}`],
       },
-      unit_amount: Math.round(item.product.price * 100), // cents
+      unit_amount: Math.round(item.tour.price * 100), // cents
     },
-    quantity: item.quantity,
+    quantity: item.groupSize,
   }));
 
   try {
@@ -84,13 +89,12 @@ controller.createBookingsFromCart = async (req, res, next) => {
 
     for (const id in cart.items) {
       const item = cart.items[id];
-
-    console.log(typeof user._id);
       
       const booking = await Booking.create({
-        tour: item.product._id,
+        tour: item.tour._id,
         user: user._id,
-        price: parseFloat(item.total),
+        groupSize: item.groupSize, 
+        price: parseFloat(item.totalPrice),
         paid: true
       });
 
@@ -111,5 +115,28 @@ controller.createBookingsFromCart = async (req, res, next) => {
   }
 };
 
+controller.updateGroupSize = (req, res, next) => {
+  const { id, orderSize } = req.body;
+
+  if (!id || !orderSize || orderSize < 1) {
+    return res.status(400).json({ message: 'Invalid request data' });
+  }
+
+  // Validate existence of item
+  const item = req.session.cart.items[id];
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found in cart' });
+  }
+
+  // Update group size
+  const updatedItem = req.session.cart.updateTourSize(id, parseInt(orderSize));
+
+  return res.status(200).json({
+    updatedItemTotal: updatedItem.totalPrice,
+    subtotal: req.session.cart.subtotal,
+    discount: req.session.cart.discount,
+    total: req.session.cart.total
+  });
+};
 
 module.exports = controller;

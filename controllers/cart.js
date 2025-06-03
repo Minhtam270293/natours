@@ -12,17 +12,18 @@ class Cart {
     }
 
     get quantity() {
-        let quantity = 0;
-        for (let id in this.items) {
-            quantity += parseInt(this.items[id].quantity);
-        }
-        return quantity;
+        // let quantity = 0;
+        // for (let id in this.items) {
+        //     quantity += parseInt(this.items[id].quantity);
+        // }
+        // return quantity;
+        return Object.keys(this.items).length;
     }
 
     get subtotal() {
         let price = 0;
         for (let id in this.items) {
-            price += parseFloat(this.items[id].total);
+            price += parseFloat(this.items[id].totalPrice);
         }
         return parseFloat(price).toFixed(2);
     }
@@ -32,18 +33,18 @@ class Cart {
         return parseFloat(price).toFixed(2);
     }
 
-    add(product, quantity) {
-        let id = product._id;
+    // add(product, quantity) {
+    //     let id = product._id;
 
-        let storedItem = this.items[id];
-        if (!storedItem) {
-            this.items[id] = { product, quantity: 0, total: 0 };
-            storedItem = this.items[id];
-        }
-        storedItem.quantity += parseInt(quantity);
-        storedItem.total = parseFloat(storedItem.product.price * storedItem.quantity).toFixed(2);
-        return storedItem;
-    }
+    //     let storedItem = this.items[id];
+    //     if (!storedItem) {
+    //         this.items[id] = { product, quantity: 0, total: 0 };
+    //         storedItem = this.items[id];
+    //     }
+    //     storedItem.quantity += parseInt(quantity);
+    //     storedItem.total = parseFloat(storedItem.product.price * storedItem.quantity).toFixed(2);
+    //     return storedItem;
+    // }
 
     remove(id) {
         let storedItem = this.items[id];
@@ -52,11 +53,36 @@ class Cart {
         }
     }
 
-    update(id, quantity) {
-        let storedItem = this.items[id];
-        if (storedItem && quantity >= 1) {
-            storedItem.quantity = quantity;
-            storedItem.total = parseFloat(storedItem.product.price * storedItem.quantity).toFixed(2);
+    // update(id, quantity) {
+    //     let storedItem = this.items[id];
+    //     if (storedItem && quantity >= 1) {
+    //         storedItem.quantity = quantity;
+    //         storedItem.total = parseFloat(storedItem.product.price * storedItem.quantity).toFixed(2);
+    //     }
+    //     return storedItem;
+    // }
+
+    addTour(tour, orderSize=1) {
+        const tourID = tour._id;
+
+        
+        if (!this.items[tourID]) {
+            const size = parseInt(orderSize);
+            this.items[tourID] = {
+                tour,
+                groupSize: size,
+                totalPrice: parseFloat(tour.price * size).toFixed(2)
+            }
+        }
+
+        return this.items[tourID];
+    }
+
+    updateTourSize(tourID, updatedSize) {
+        let storedItem = this.items[tourID];
+        if (storedItem && updatedSize >= 1) {
+            storedItem.groupSize = updatedSize;
+            storedItem.totalPrice = parseFloat(storedItem.tour.price * storedItem.groupSize).toFixed(2);
         }
         return storedItem;
     }
@@ -71,8 +97,8 @@ class Cart {
     #generateArray() {
         let arr = [];
         for (let id in this.items) {
-            this.items[id].product.price = parseFloat(this.items[id].product.price).toFixed(2);
-            this.items[id].total = parseFloat(this.items[id].total).toFixed(2);
+            this.items[id].tour.price = parseFloat(this.items[id].tour.price).toFixed(2);
+            this.items[id].totalPrice = parseFloat(this.items[id].totalPrice).toFixed(2);
             arr.push(this.items[id]);
         }
         return arr;

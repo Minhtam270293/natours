@@ -1,0 +1,28 @@
+extends base
+
+block content
+
+          h2.heading-secondary.ma-bt-md YOUR BOOKINGS
+
+          if bookings.length
+            table.data-table
+              thead
+                tr
+                  th Preview Image
+                  th Tour Name
+                  th No. of Guests
+                  th Paid Amount
+                  th Payment Date
+              tbody
+                each booking in bookings
+                  tr
+                    td 
+                      a(href=`/tour/${booking.tour.slug}`)
+                        img.data-image(src=`/img/tours/${booking.tour.imageCover}`, alt='Tour image')
+                    td 
+                      a(href=`/tour/${booking.tour.slug}`)= booking.tour.name
+                    td= booking.groupSize
+                    td $#{booking.price.toFixed(2)}
+                    td= booking.createdAt.toLocaleString('en-US')
+          else
+            p You have no bookings yet.

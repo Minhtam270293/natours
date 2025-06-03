@@ -15,19 +15,24 @@ const bookingSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Booking must have a price.']
     },
+    groupSize: {
+        type: Number,
+        required: [true, 'Booking must have a group size']
+    },
     createdAt : {
         type: Date,
         default: Date.now
     },
     paid: {
-        type: Boolean
+        type: Boolean,
+        default: true
     }
 })
 
 bookingSchema.pre(/^find/, function(next) {
     this.populate('user').populate({
         path: 'tour',
-        select: 'name'
+        select: 'name imageCover slug'
     })
     next();
 })

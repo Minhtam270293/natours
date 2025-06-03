@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
+const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -46,6 +47,16 @@ exports.viewCart = (req, res) => {
 
   res.status(200).render('cart', {
     title: 'Cart details',
+  });
+};
+
+exports.viewBooking = async (req, res) => {
+
+  const bookings = await Booking.find({ user: req.user.id });
+
+  res.status(200).render('booking', {
+    title: 'My bookings',
+    bookings
   });
 };
 
