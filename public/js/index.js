@@ -13,6 +13,8 @@ const signupForm = document.querySelector('.form--signup');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const addToCartButton = document.querySelector('.add-to-cart');
+const checkoutForm = document.querySelector('.form--checkout')
+
 
 // DELEGATION
 
@@ -78,4 +80,12 @@ if (userPasswordForm)
     document.getElementById('password-current').value = '';
     document.getElementById('password').value = '';
     document.getElementById('password-confirm').value = '';
+  });
+
+  if (checkoutForm && !res.locals.user)
+    checkoutForm.addEventListener('click', e => {
+      if(!isLoggedIn) {
+        e.preventDefault();
+        alert('Please log in to proceed with payment');
+      }
   });

@@ -234,8 +234,19 @@ body {
   background-color: #55c57a;
   color: #fff;
 }
+
 .btn--green::after {
   background-color: #55c57a;
+}
+
+.btn--payStripe {
+  background-color: #55c57a;
+  color: #fff;
+}
+
+.btn--clearAllCart {
+  background-color: #da2118;
+  color: #fff;
 }
 
 .btn--small {

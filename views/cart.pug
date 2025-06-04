@@ -47,10 +47,10 @@ block content
 
     .data-actions
       form(method='POST', action='api/v1/carts/clear')
-        button.btn.btn--small.btn--danger(type='submit') CLEAR CART
+        button.btn.btn--small.btn--clearAllCart(type='submit') CLEAR CART
 
-      form(method='POST', action='api/v1/users/checkout')
-        button.btn.btn--small.btn--green(type='submit') PAY WITH STRIPE
+      form.form--checkout(method='POST', action='api/v1/users/checkout')
+        button.btn.btn--small.btn--payStripe(type='submit') PAY WITH STRIPE
 
   else
     h2.heading-secondary.ma-bt-md YOUR CART IS EMPTY
