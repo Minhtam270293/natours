@@ -96,3 +96,11 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     user: updatedUser
   });
 });
+
+exports.viewAllBookings = async (req, res) => {
+  const bookings = await Booking.find().populate('user').populate('tour');
+  res.status(200).render('allBookings', {
+    title: 'Manage All Bookings',
+    bookings
+  });
+};
