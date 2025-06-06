@@ -15,7 +15,7 @@ const userPasswordForm = document.querySelector('.form-user-password');
 const addToCartButton = document.querySelector('.add-to-cart');
 const checkoutForm = document.querySelector('.form--checkout')
 const userEditForm = document.querySelector('.form-user-edit');
-const deleteUserBtn = document.querySelector('.btn--delete-user')
+const deleteUserBtns = document.querySelectorAll('.btn--delete-user');
 
 // DELEGATION
 
@@ -75,11 +75,16 @@ if (userEditForm)
     editUser(form, userToEditId);
   });
 
-// if (deleteUserBtn)
-//   deleteUserBtn.addEventListener('submit', e => {
-//     e.preventDefault();
-//     editUser(this.dataset.userId);
-//   });
+if (deleteUserBtns)
+  deleteUserBtns.forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const confirmed = confirm('Are you sure you want to delete this user?');
+      if (!confirmed) return;
+      const userId = String(this.dataset.userId);
+      deleteUser(userId);
+    });
+  });
 
 if (userPasswordForm)
   userPasswordForm.addEventListener('submit', async e => {
