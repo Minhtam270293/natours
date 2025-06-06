@@ -104,3 +104,19 @@ exports.viewAllBookings = async (req, res) => {
     bookings
   });
 };
+
+exports.viewAllUsers = async (req, res) => {
+  const users = await User.find();
+  res.status(200).render('allUsers', {
+    title: 'Manage All Users',
+    users
+  });
+};
+
+exports.viewEditUser = async (req, res) => {
+  const userToEdit = await User.findById(req.params.id);
+  res.status(200).render('editUser', {
+    title: 'Edit user',
+    userToEdit
+  });
+};

@@ -1,0 +1,22 @@
+extends base
+
+block content
+
+    .user-view__content
+        .user-view__form-container
+            h2.heading-secondary.ma-bt-md Edit user information
+          
+            form.form.form-user-edit
+                .form__group
+                    label.form__label(for='name') Name
+                    input#name.form__input(type='text', value=`${userToEdit.name}`, required, name='name')
+                    input(type='hidden', id='userToEditId', value=`${userToEdit._id}`)
+                .form__group.ma-bt-md
+                    label.form__label(for='role') Role
+                    input#role.form__input(type='text', value=`${userToEdit.role}`, required, name='role')
+                .form__group.form__photo-upload
+                    img.form__user-photo(src=`/img/users/${userToEdit.photo}`, alt='User photo')
+                    input.form__upload(type='file', accept='image/*', id='photo', name='photo')
+                    label(for='photo') Choose new photo
+                .form__group.right
+                    button.btn.btn--small.btn--green Save changes

@@ -1,0 +1,30 @@
+extends base
+
+block content
+  h2.heading-secondary.ma-bt-md ALL USERS
+
+  if users.length
+    table.data-table
+      thead
+        tr
+          th Name
+          th Email
+          th Photo
+          th Role
+          th Actions
+      tbody
+        each user in users
+          tr
+            td= user.name
+            td= user.email
+            td
+              img.data-image(src=`/img/users/${user.photo}`, alt='User photo')
+            td= user.role
+            td
+              a.btn.btn--small.btn--green(href=`/users/${user._id}/edit`) Edit
+              button.btn.btn--small.btn--delete-user(
+                type='button',
+                data-userId=`${user._id}`
+              ) Delete
+  else
+    h2.heading-secondary.ma-bt-md NO USERS FOUND

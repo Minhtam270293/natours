@@ -14,7 +14,8 @@ const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const addToCartButton = document.querySelector('.add-to-cart');
 const checkoutForm = document.querySelector('.form--checkout')
-
+const userEditForm = document.querySelector('.form-user-edit');
+const deleteUserBtn = document.querySelector('.btn--delete-user')
 
 // DELEGATION
 
@@ -63,6 +64,23 @@ if (userDataForm)
     updateSettings(form, 'data');
   });
 
+if (userEditForm)
+  userEditForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('role', document.getElementById('role').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+    const userToEditId = document.getElementById('userToEditId').value;
+    editUser(form, userToEditId);
+  });
+
+// if (deleteUserBtn)
+//   deleteUserBtn.addEventListener('submit', e => {
+//     e.preventDefault();
+//     editUser(this.dataset.userId);
+//   });
+
 if (userPasswordForm)
   userPasswordForm.addEventListener('submit', async e => {
     e.preventDefault();
@@ -82,7 +100,7 @@ if (userPasswordForm)
     document.getElementById('password-confirm').value = '';
   });
 
-  if (checkoutForm && !res.locals.user)
+if (checkoutForm && !res.locals.user)
     checkoutForm.addEventListener('click', e => {
       if(!isLoggedIn) {
         e.preventDefault();
