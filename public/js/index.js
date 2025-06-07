@@ -75,16 +75,18 @@ if (userEditForm)
     editUser(form, userToEditId);
   });
 
-if (deleteUserBtns)
+if (deleteUserBtns) {
   deleteUserBtns.forEach(btn => {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      const confirmed = confirm('Are you sure you want to delete this user?');
-      if (!confirmed) return;
-      const userId = String(this.dataset.userId);
-      deleteUser(userId);
+    btn.addEventListener('click', async function (e) {
+      const userId = this.dataset.userid;
+      console.log(userId);
+    if (confirm('Are you sure you want to delete this user?')) {
+      await deleteUser(userId);
+      this.closest('tr').remove();
+      }
     });
   });
+};
 
 if (userPasswordForm)
   userPasswordForm.addEventListener('submit', async e => {

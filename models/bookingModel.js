@@ -11,6 +11,11 @@ const bookingSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'Booking must belong to a User']
     },
+    promotion: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Promotion',
+    required: false
+    },
     price: {
         type: Number,
         required: [true, 'Booking must have a price.']
