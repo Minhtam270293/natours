@@ -107,10 +107,12 @@ if (userPasswordForm)
     document.getElementById('password-confirm').value = '';
   });
 
-if (checkoutForm && !res.locals.user)
-    checkoutForm.addEventListener('click', e => {
-      if(!isLoggedIn) {
-        e.preventDefault();
-        alert('Please log in to proceed with payment');
-      }
+if (checkoutForm)
+  checkoutForm.addEventListener('submit', function(e) {
+    if (typeof isLoggedIn !== 'undefined' && !isLoggedIn) {
+      e.preventDefault();
+      alert('Please log in to proceed with payment');
+      return;
+    }
+    handleCartSuccess(e);
   });

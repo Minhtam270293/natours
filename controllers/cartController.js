@@ -1,6 +1,5 @@
 'use strict';
-const Stripe = require('stripe');
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel')
 
@@ -45,19 +44,30 @@ controller.checkout = async (req, res) => {
     return res.redirect('/cart');
   }
 
-  const cart = req.session.cart.getCart();
+  const cartItems = Object.values(req.session.cart.items);
+  const lineItems = [];
 
-  const lineItems = cart.items.map(item => ({
-    price_data: {
-      currency: 'usd',
-      product_data: {
-        name: item.tour.name,
-        images: [`https://natours.dev/img/tours/${item.tour.imageCover}`],
+  for (const item of cartItems) {
+    // Fetch the latest tour data
+    const tour = await Tour.findById(item.tour._id);
+    if (!tour) {
+      return res.status(400).send('One or more tours in your cart are no longer available.');
+    }
+
+    // Optional: Check availability, group size, etc.
+
+    lineItems.push({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: tour.name,
+          images: [`https://natours.dev/img/tours/${tour.imageCover}`],
+        },
+        unit_amount: Math.round(tour.price * 100), // cents
       },
-      unit_amount: Math.round(item.tour.price * 100), // cents
-    },
-    quantity: item.groupSize,
-  }));
+      quantity: item.groupSize,
+    });
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -65,11 +75,10 @@ controller.checkout = async (req, res) => {
       line_items: lineItems,
       mode: 'payment',
       success_url: `${req.protocol}://${req.get('host')}/cart/success`,
-      cancel_url: `${req.protocol}://${req.get('host')}/cart`,
-      customer_email: req.user.email, // if you have auth
+      cancel_url: `${req.protocol}://${req.get('host')}/cart/cancel`,
     });
 
-    res.redirect(303, session.url);
+  res.status(200).json({ id: session.id });
   } catch (err) {
     console.error('❌ Stripe error:', err);
     res.status(500).send('Checkout failed');

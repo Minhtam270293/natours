@@ -66,6 +66,12 @@ exports.viewCheckoutSuccess = (req, res) => {
   })
 }
 
+exports.viewCheckoutCancel = (req, res) => {
+  res.status(200).render('checkoutCancel', {
+    title: 'Cheking out failed'
+  })
+}
+
 exports.getSignUpForm = (req, res) => {
   res.status(200).render('signup', {
     title: 'Create an account'
