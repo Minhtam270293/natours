@@ -1,6 +1,5 @@
 'use strict';
-const Stripe = require('stripe');
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel')
 
@@ -39,6 +38,7 @@ controller.clear = (req, res) => {
   req.session.cart.clear();
   return res.redirect('/cart');
 };
+
 
 controller.checkout = async (req, res) => {
   if (!req.session.cart || Object.keys(req.session.cart.items).length === 0) {
