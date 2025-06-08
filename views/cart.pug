@@ -49,11 +49,12 @@ block content
       form(method='POST', action='api/v1/carts/clear')
         button.btn.btn--small.btn--clearAllCart(type='submit') CLEAR CART
 
-      form.form--checkout(method='POST', action='api/v1/users/checkout')
+      form.form--checkout(method='POST', action='#')
         button.btn.btn--small.btn--payStripe(type='submit') MAKE PAYMENT
 
   else
     h2.heading-secondary.ma-bt-md YOUR CART IS EMPTY
 
-block scripts 
+block scripts
+  script(src='https://js.stripe.com/v3/')
   script(src='/js/changeTourGroupSize.js')

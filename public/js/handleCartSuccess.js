@@ -1,17 +1,14 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const res = await axios({
-      method: 'POST',
-      url: '/api/v1/carts/complete'
-    });
+const handleCartSuccess = async function(e) {
+  e.preventDefault();
 
-    if (res.data.status !== 'success') {
-      alert('Booking failed: ' + res.data.message);
-    } else {
-        document.getElementById('cart-quantity').innerText = `(0)`;
-    }
-  } catch (err) {
-    console.error('❌ Error completing booking:', err);
-    alert('Something went wrong.');
+  const stripe = Stripe('pk_test_51RMpwICz2yvqbafcMv2DbF0LRiTWyQToTE32i16rSbSHtAczYzcR0hNSpS71fu8zXlHwQ97JDNZ4j8Qbuj3R1tQG000tRmKKhJ');
+
+  const response = await axios.post('/api/v1/users/checkout');
+
+  const sessionId = response.data.id;
+
+  const result = await stripe.redirectToCheckout({ sessionId });
+  if (result.error) {
+    alert(result.error.message);
   }
-});
+}

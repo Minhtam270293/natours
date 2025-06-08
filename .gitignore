@@ -18,8 +18,10 @@ pids
 coverage/
 
 # Jest cache
+coverage/
 jest-cache/
 jest-worker/
+jest-test-results.json
 
 # Parcel bundler cache/output
 .cache/
