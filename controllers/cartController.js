@@ -54,8 +54,6 @@ controller.checkout = async (req, res) => {
       return res.status(400).send('One or more tours in your cart are no longer available.');
     }
 
-    // Optional: Check availability, group size, etc.
-
     lineItems.push({
       price_data: {
         currency: 'usd',
