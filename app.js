@@ -19,6 +19,8 @@ const cartRouter = require('./routes/cartRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const promotionRouter = require('./routes/promotionRoutes');
 
+const cartController = require('./controllers/cartController')
+
 const app = express();
 
 app.set('view engine', 'pug');
@@ -57,6 +59,16 @@ const limiter = rateLimit({
 app.use('/api' , limiter);
 
 // Content Security Policy
+
+
+// Webhook
+app.enable('trust proxy');
+
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  cartController.webhookCheckout
+);
 
 
 // Body parser, reading data from the body into req.body

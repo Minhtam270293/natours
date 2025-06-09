@@ -20,9 +20,10 @@ controller.add = async (req, res, next) => {
 
             req.session.cart.addTour(tour, orderSize);
             return res.json({ quantity: req.session.cart.quantity });
-        } else {
-            return res.status(404).json({ message: 'Tour not found' });
-        }
+        } 
+        
+        return res.status(404).json({ message: 'Tour not found' });
+        
     } catch (err) {
         console.error('❌ Error in controller.add:', err);
         return res.status(500).json({ message: 'Server error' });
@@ -47,6 +48,7 @@ controller.checkout = async (req, res) => {
 
   const cartItems = Object.values(req.session.cart.items);
   const lineItems = [];
+  const bookingData = [];
 
   for (const item of cartItems) {
     // Fetch the latest tour data
@@ -60,66 +62,38 @@ controller.checkout = async (req, res) => {
         currency: 'usd',
         product_data: {
           name: tour.name,
-          images: [`https://natours.dev/img/tours/${tour.imageCover}`],
+          images: [`${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`],
         },
-        unit_amount: Math.round(tour.price * 100), // cents
+        unit_amount: Math.round(tour.price * 100),
       },
       quantity: item.groupSize,
+    });
+
+    bookingData.push({
+      tourId: tour._id.toString(),
+      groupSize: item.groupSize,
+      totalPrice: item.groupSize * tour.price
     });
   }
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      customer_email: req.user.email,
       line_items: lineItems,
       mode: 'payment',
       success_url: `${req.protocol}://${req.get('host')}/cart/success`,
       cancel_url: `${req.protocol}://${req.get('host')}/cart/cancel`,
+      metadata: {
+        userId: req.user._id.toString(),
+        bookings: JSON.stringify(bookingData)
+      }
     });
 
-  res.status(200).json({ id: session.id });
+    res.status(200).json({ id: session.id });
   } catch (err) {
     console.error('❌ Stripe error:', err);
     res.status(500).send('Checkout failed');
-  }
-};
-
-controller.createBookingsFromCart = async (req, res, next) => {
-  const cart = req.session.cart.getCart();
-  const user = req.user;
-
-  if (!cart || !cart.items || Object.keys(cart.items).length === 0) {
-    return res.status(400).json({ status: 'fail', message: 'Cart is empty' });
-  }
-
-  try {
-    const bookings = [];
-
-    for (const id in cart.items) {
-      const item = cart.items[id];
-      
-      const booking = await Booking.create({
-        tour: item.tour._id,
-        user: user._id,
-        groupSize: item.groupSize, 
-        price: parseFloat(item.totalPrice),
-        paid: true
-      });
-
-      bookings.push(booking);
-    }
-
-    // Clear cart from session
-    req.session.cart.clear();
-
-    res.status(201).json({
-      status: 'success',
-      message: 'Bookings created successfully',
-      data: { bookings }
-    });
-  } catch (err) {
-    console.error('Error creating bookings:', err);
-    res.status(500).json({ status: 'error', message: 'Failed to create bookings' });
   }
 };
 
@@ -145,6 +119,56 @@ controller.updateGroupSize = (req, res, next) => {
     discount: req.session.cart.discount,
     total: req.session.cart.total
   });
+};
+
+const createBookingCheckout = async (session) => {
+  try {
+    const userId = session.metadata.userId;
+    const bookingsData = JSON.parse(session.metadata.bookings);
+    const bookings = await Promise.all(
+      bookingsData.map(item =>
+        Booking.create({
+          tour: item.tourId,
+          user: userId,
+          groupSize: item.groupSize,
+          price: item.totalPrice,
+          paid: true
+        })
+      )
+    );
+    return bookings;
+  } catch (err) {
+    console.error('Error creating bookings from Stripe session:', err);
+    throw err;
+  }
+};
+
+controller.webhookCheckout = async (req, res) => {
+  console.log('Stripe webhook received');
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    try {
+      await createBookingCheckout(session);
+    } catch (err) {
+      return res.status(500).json({ status: 'error', message: 'Failed to create bookings from Stripe session' });
+    }
+  }
+
+  res.status(200).json({ received: true });
 };
 
 module.exports = controller;
