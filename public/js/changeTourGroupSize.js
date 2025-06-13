@@ -45,6 +45,19 @@ document.querySelectorAll('.group-size-form').forEach(form => {
 
   increaseBtn.addEventListener('click', () => {
     let current = parseInt(input.value);
-    updateGroupSize(current + 1);
+    // Prevent exceeding remaining slots
+    const max = parseInt(form.dataset.maxgroupsize) || Infinity;
+    const remaining = parseInt(form.dataset.remainingslots) || Infinity;
+    // The maximum group size user can select is current + remaining slots
+    if (current < max && current - 1 + remaining > 0) {
+      // Only allow increase if not exceeding remaining slots
+      if (current < remaining) {
+        updateGroupSize(current + 1);
+      } else {
+        alert('No more slots available for this tour.');
+      }
+    } else {
+      alert('Cannot exceed the maximum group size or available slots.');
+    }
   });
 });

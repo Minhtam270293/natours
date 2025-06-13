@@ -235,12 +235,22 @@ body {
   color: #fff;
 }
 
+.btn--payStripe {
+  background-color: #55c57a;
+  color: #fff;
+}
+
+.btn--gray {
+  background-color: #333;
+  color: #fff;
+}
+
 .btn--green::after {
   background-color: #55c57a;
 }
 
-.btn--payStripe {
-  background-color: #55c57a;
+.btn--red {
+  background-color: #da2118;
   color: #fff;
 }
 

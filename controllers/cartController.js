@@ -1,7 +1,9 @@
 'use strict';
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
-const Booking = require('../models/bookingModel')
+const User = require('../models/userModel');
+const Booking = require('../models/bookingModel');
+const mongoose = require('mongoose');
 
 
 let controller = {};
@@ -121,20 +123,41 @@ controller.updateGroupSize = (req, res, next) => {
   });
 };
 
+// Helper to decrement remaining slots for a tour
+const updateTourSlots = async function(tourId, groupSize) {
+  // Ensure tourId is a valid ObjectId
+  let id = tourId;
+  if (typeof tourId === 'string' && mongoose.Types.ObjectId.isValid(tourId)) {
+    id = mongoose.Types.ObjectId(tourId);
+  }
+  // Debug: log what we're updating
+  console.log('[updateTourSlots] tourId:', id, 'groupSize:', groupSize);
+  const result = await Tour.findByIdAndUpdate(
+    id,
+    { $inc: { remainingSlots: -groupSize } },
+    { new: true }
+  );
+  // Debug: log the result
+  console.log('[updateTourSlots] update result:', result);
+}
+
 const createBookingCheckout = async (session) => {
   try {
     const userId = session.metadata.userId;
     const bookingsData = JSON.parse(session.metadata.bookings);
     const bookings = await Promise.all(
-      bookingsData.map(item =>
-        Booking.create({
+      bookingsData.map(async item => {
+        const booking = await Booking.create({
           tour: item.tourId,
           user: userId,
           groupSize: item.groupSize,
           price: item.totalPrice,
           paid: true
-        })
-      )
+        });
+        
+        await updateTourSlots(item.tourId, item.groupSize);
+        return booking;
+      })
     );
     return bookings;
   } catch (err) {
