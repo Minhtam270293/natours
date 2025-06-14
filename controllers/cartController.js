@@ -74,7 +74,7 @@ controller.createBookingFromCart = async (user, cart) => {
   return booking;
 };
 
-const createStripeSession = async (req, res) => {
+controller.createStripeSession = async (req, res) => {
   try {
     const booking = await createBookingFromCart(req.user, req.session.cart);
 
