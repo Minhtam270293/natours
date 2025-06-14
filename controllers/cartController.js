@@ -40,43 +40,68 @@ controller.clear = (req, res) => {
   return res.redirect('/cart');
 };
 
+controller.createBookingFromCart = async (user, cart) => {
 
-controller.checkout = async (req, res) => {
-  if (!req.session.cart || Object.keys(req.session.cart.items).length === 0) {
-    return res.redirect('/cart');
+  if (!cart || Object.keys(cart.items).length === 0) {
+    throw new Error('Cart is empty');
   }
 
-  const cartItems = Object.values(req.session.cart.items);
-  const lineItems = [];
-  const bookingData = [];
+  const cartItems = Object.values(cart.items);
+  const tours = [];
+  let totalPrice = 0;
 
   for (const item of cartItems) {
-    // Fetch the latest tour data
     const tour = await Tour.findById(item.tour._id);
-    if (!tour) {
-      return res.status(400).send('One or more tours in your cart are no longer available.');
-    }
-
-    lineItems.push({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: tour.name,
-          images: [`${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`],
-        },
-        unit_amount: Math.round(tour.price * 100),
-      },
-      quantity: item.groupSize,
-    });
-
-    bookingData.push({
-      tourId: tour._id.toString(),
+    if (!tour) throw new Error('One or more tours in your cart are no longer available.');
+    tours.push({
+      tour: tour._id,
       groupSize: item.groupSize,
-      totalPrice: item.groupSize * tour.price
+      price: item.totalPrice // or item.price if per-person
     });
-  }
+    totalPrice += item.totalPrice;
+  } 
 
+  const booking = await Booking.create({
+    user: user._id,
+    tours,
+    totalPrice,
+    // coupon: cart.coupon, // if you have coupon logic
+    // status: 'pending' // default
+  });
+
+  return booking;
+};
+
+const createStripeSession = async (req, res) => {
   try {
+    const booking = await createBookingFromCart(req.user, req.session.cart);
+
+    // Fetch all tour details for the tours in the booking
+    const tourIds = booking.tours.map(t => t.tour);
+    const tours = await Tour.find({ _id: { $in: tourIds } });
+
+    // Build a map for quick lookup
+    const tourMap = {};
+    tours.forEach(tour => {
+      tourMap[tour._id.toString()] = tour;
+    });
+
+    // Build line items for Stripe
+    const lineItems = booking.tours.map(tourItem => {
+      const tour = tourMap[tourItem.tour.toString()];
+      return {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: tour.name,
+            images: [`${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`],
+          },
+          unit_amount: Math.round(tourItem.pricePerPerson * 100),
+        },
+        quantity: tourItem.groupSize,
+      };
+    });
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: req.user.email,
@@ -85,8 +110,7 @@ controller.checkout = async (req, res) => {
       success_url: `${req.protocol}://${req.get('host')}/cart/success`,
       cancel_url: `${req.protocol}://${req.get('host')}/cart/cancel`,
       metadata: {
-        userId: req.user._id.toString(),
-        bookings: JSON.stringify(bookingData)
+        bookingId: booking._id.toString(),
       }
     });
 
@@ -121,26 +145,30 @@ controller.updateGroupSize = (req, res, next) => {
   });
 };
 
-const createBookingCheckout = async (session) => {
-  try {
-    const userId = session.metadata.userId;
-    const bookingsData = JSON.parse(session.metadata.bookings);
-    const bookings = await Promise.all(
-      bookingsData.map(item =>
-        Booking.create({
-          tour: item.tourId,
-          user: userId,
-          groupSize: item.groupSize,
-          price: item.totalPrice,
-          paid: true
-        })
-      )
+controller.restoreSlotsForBooking = async (bookingId) => {
+  const booking = await Booking.findById(bookingId);
+  if (!booking) return;
+
+  // Restore slots for each tour in the booking
+  for (const tourItem of booking.tours) {
+    await Tour.findByIdAndUpdate(
+      tourItem.tour,
+      { $inc: { remainingSlots: tourItem.groupSize } }
     );
-    return bookings;
-  } catch (err) {
-    console.error('Error creating bookings from Stripe session:', err);
-    throw err;
   }
+};
+
+controller.updateBookingStatus = async (bookingId, status) => {
+  const booking = await Booking.findByIdAndUpdate(
+    bookingId,
+    { status },
+    { new: true }
+  );
+  // If cancelled, restore slots
+  if (status === 'cancelled' && booking) {
+    await restoreSlotsForBooking(bookingId);
+  }
+  return booking;
 };
 
 controller.webhookCheckout = async (req, res) => {
@@ -161,9 +189,13 @@ controller.webhookCheckout = async (req, res) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
+    const bookingId = session.metadata.bookingId;
+
     try {
-      await createBookingCheckout(session);
+      await updateBookingStatus(bookingId, 'paid');
+
     } catch (err) {
+
       return res.status(500).json({ status: 'error', message: 'Failed to create bookings from Stripe session' });
     }
   }
