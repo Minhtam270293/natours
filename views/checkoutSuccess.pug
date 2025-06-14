@@ -7,3 +7,13 @@ block content
         h2.heading-secondary.heading-secondary--error Thank you for your booking!   
         h2.error__emoji 🎉
       .error__msg= msg
+
+block scripts
+  script(src='https://js.stripe.com/v3/')
+  script(src='/js/changeTourGroupSize.js')
+  form#autoClearCartForm(method='POST', action='/api/v1/carts/clear', style='display:none;')
+  script.
+    // Automatically clear cart on success page by submitting the form
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('autoClearCartForm').submit();
+    });

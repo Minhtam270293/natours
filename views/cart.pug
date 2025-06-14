@@ -22,10 +22,15 @@ block content
 
             // Group Size control
             td
-              form.group-size-form(data-id=item.tour._id)
+              form.group-size-form(
+                data-id=item.tour._id
+                data-maxgroupsize=item.tour.maxGroupSize
+                data-remainingslots=item.tour.remainingSlots
+              )
                 button(type='button', class='decrease') −
                 input(type='number', name='groupSize', value=item.groupSize, min='1', readonly)
                 button(type='button', class='increase') +
+                span.group-size-remaining(style='margin-left: 1rem; color: #888; font-size: 1.3rem;') / #{item.tour.remainingSlots}
 
             td $#{item.totalPrice}
             td

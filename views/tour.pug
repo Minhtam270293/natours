@@ -37,7 +37,7 @@ block content
           - const date = tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})
           +overviewBox('Next date', date, 'calendar')
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
-          +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
+          +overviewBox('Participants', `${tour.maxGroupSize - tour.remainingSlots} / ${tour.maxGroupSize} people`, 'user')
           +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
 
         .overview-box__group
@@ -81,4 +81,19 @@ block content
       .cta__content
         h2.heading-secondary What are you waiting for?
         p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
-        button.btn.btn--green.span-all-rows.add-to-cart(data-id=tour.id) ADD TO CART
+        - let btnClass = 'btn span-all-rows';
+        - let btnText = 'ADD TO CART';
+        - let btnDisabled = false;
+        if (typeof tour.remainingSlots === 'number' && tour.remainingSlots !== 0)
+          - btnClass += ' btn--green add-to-cart';
+          - btnText = 'ADD TO CART';
+          - btnDisabled = false;
+        else if (typeof tour.remainingSlots === 'number')
+          - btnClass += ' btn--gray';
+          - btnText = 'TOUR IS FULL';
+          - btnDisabled = true;
+        else
+          - btnClass += ' btn--gray';
+          - btnText = 'INFO UNAVAILABLE';
+          - btnDisabled = true;
+        button(class=btnClass, data-id=tour.id, disabled=btnDisabled)= btnText

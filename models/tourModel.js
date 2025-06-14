@@ -23,6 +23,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a group size'],
     },
+    remainingSlots: {
+      // Will be set to maxGroupSize on creation
+
+      type: Number,
+      min: [0, 'Remaining slots cannot be negative'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'Remaining slots must be an integer'
+      }
+    },
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
@@ -137,6 +147,10 @@ tourSchema.virtual('reviews', {
 // DOCUMENT MIDDLEWARE: runs before .save() and .create(), not on insertMany()
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
+  // Set remainingSlots to maxGroupSize only on creation
+  if (this.isNew) {
+    this.remainingSlots = this.maxGroupSize;
+  }
   next();
 });
 
@@ -200,3 +214,7 @@ tourSchema.pre(/^find/, function(next) {
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
+
+
+
+
