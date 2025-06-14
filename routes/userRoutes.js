@@ -16,7 +16,7 @@ router.patch('/resetPassword/:token', authController.resetPassword);
 
 // Protect all routes after this middleware
 router.use(authController.protect);
-router.post('/checkout', cartController.checkout);
+router.post('/checkout', cartController.createStripeSession);
 
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);

@@ -42,7 +42,24 @@ controller.clear = (req, res) => {
   return res.redirect('/cart');
 };
 
-controller.createBookingFromCart = async (user, cart) => {
+const updateTourSlots = async function(tourId, groupSize) {
+  // Ensure tourId is a valid ObjectId
+  let id = tourId;
+  if (typeof tourId === 'string' && mongoose.Types.ObjectId.isValid(tourId)) {
+    id = mongoose.Types.ObjectId(tourId);
+  }
+  // Debug: log what we're updating
+  console.log('[updateTourSlots] tourId:', id, 'groupSize:', groupSize);
+  const result = await Tour.findByIdAndUpdate(
+    id,
+    { $inc: { remainingSlots: -groupSize } },
+    { new: true }
+  );
+  // Debug: log the result
+  console.log('[updateTourSlots] update result:', result);
+}
+
+const createBookingFromCart = async (user, cart) => {
 
   if (!cart || Object.keys(cart.items).length === 0) {
     throw new Error('Cart is empty');
@@ -70,6 +87,10 @@ controller.createBookingFromCart = async (user, cart) => {
     // coupon: cart.coupon, // if you have coupon logic
     // status: 'pending' // default
   });
+
+  for (const item of booking.tours) {
+    await updateTourSlots(item.tour, item.groupSize);
+  }
 
   return booking;
 };
@@ -147,23 +168,7 @@ controller.updateGroupSize = (req, res, next) => {
   });
 };
 
-// Helper to decrement remaining slots for a tour
-const updateTourSlots = async function(tourId, groupSize) {
-  // Ensure tourId is a valid ObjectId
-  let id = tourId;
-  if (typeof tourId === 'string' && mongoose.Types.ObjectId.isValid(tourId)) {
-    id = mongoose.Types.ObjectId(tourId);
-  }
-  // Debug: log what we're updating
-  console.log('[updateTourSlots] tourId:', id, 'groupSize:', groupSize);
-  const result = await Tour.findByIdAndUpdate(
-    id,
-    { $inc: { remainingSlots: -groupSize } },
-    { new: true }
-  );
-  // Debug: log the result
-  console.log('[updateTourSlots] update result:', result);
-}
+
 
 controller.restoreSlotsForBooking = async (bookingId) => {
   const booking = await Booking.findById(bookingId);
