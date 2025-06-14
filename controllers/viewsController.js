@@ -50,16 +50,6 @@ exports.viewCart = (req, res) => {
   });
 };
 
-exports.viewBooking = async (req, res) => {
-
-  const bookings = await Booking.find({ user: req.user.id });
-
-  res.status(200).render('booking', {
-    title: 'My bookings',
-    bookings
-  });
-};
-
 exports.viewCheckoutSuccess = (req, res) => {
   res.status(200).render('checkoutSuccess', {
     title: 'Cheking out successfully'
@@ -103,8 +93,18 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.viewBooking = async (req, res) => {
+
+  const bookings = await Booking.find({ user: req.user.id }).populate('tours.tour');
+
+  res.status(200).render('booking', {
+    title: 'My bookings',
+    bookings
+  });
+};
+
 exports.viewAllBookings = async (req, res) => {
-  const bookings = await Booking.find().populate('user').populate('tour');
+  const bookings = await Booking.find().populate('user').populate('tours.tour');
   res.status(200).render('allBookings', {
     title: 'Manage All Bookings',
     bookings

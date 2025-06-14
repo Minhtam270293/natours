@@ -8,21 +8,22 @@ block content
             table.data-table
               thead
                 tr
-                  th Preview Image
-                  th Tour Name
-                  th No. of Guests
-                  th Paid Amount
-                  th Payment Date
+                  th Tours
+                  th Amount Paid
+                  th Date
+                  th Status
               tbody
                 each booking in bookings
                   tr
+                    td #{booking.tours.map(item => item.tour.name).join(', ')}
+                    td $#{booking.totalPrice}
+                    td #{booking.createdAt.toLocaleString('en-US')}
                     td 
-                      a(href=`/tour/${booking.tour.slug}`)
-                        img.data-image(src=`/img/tours/${booking.tour.imageCover}`, alt='Tour image')
-                    td 
-                      a(href=`/tour/${booking.tour.slug}`, style='color: inherit; text-decoration: none;')= booking.tour.name
-                    td= booking.groupSize
-                    td $#{booking.price.toFixed(2)}
-                    td= booking.createdAt.toLocaleString('en-US')
-          else
+                      if booking.status === 'paid'
+                        span(style='color:green') Paid
+                      else if booking.status === 'pending'
+                        span(style='color:orange') Pending
+                      else if booking.status === 'cancelled'
+                        span(style='color:red') Cancelled
+                      else
             h2.heading-secondary.ma-bt-md You have no bookings yet.
