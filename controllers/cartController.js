@@ -67,7 +67,7 @@ const createBookingFromCart = async (user, cart) => {
 
   const cartItems = Object.values(cart.items);
   const tours = [];
-  let totalCartPrice = 0;
+  let bookingTotalPrice = 0;
 
   for (const item of cartItems) {
     const tour = await Tour.findById(item.tour._id);
