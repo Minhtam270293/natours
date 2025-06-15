@@ -17,7 +17,7 @@ block content
           tr
             td #{booking.user.name} (#{booking.user.email})
             td #{booking.tours.map(item => item.tour.name).join(', ')}
-            td $#{booking.price.toFixed(2)}
+            td $#{booking.bookingTotalPrice.toFixed(2)}
             td #{booking.createdAt.toLocaleString('en-US')}
             td 
               if booking.status === 'paid'

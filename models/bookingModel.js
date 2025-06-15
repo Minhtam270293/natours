@@ -11,11 +11,6 @@ const bookingTourSchema = new mongoose.Schema({
     required: true,
     min: 1
   },
-  pricePerPerson: { // Store at booking time!
-    type: Number,
-    required: true,
-    min: 0
-  },
   tourTotalPrice : { // pricePerPerson * groupSize
     type: Number,
     required: true,
