@@ -67,23 +67,27 @@ const createBookingFromCart = async (user, cart) => {
 
   const cartItems = Object.values(cart.items);
   const tours = [];
-  let totalPrice = 0;
+  let totalCartPrice = 0;
 
   for (const item of cartItems) {
     const tour = await Tour.findById(item.tour._id);
     if (!tour) throw new Error('One or more tours in your cart are no longer available.');
+    const pricePerPerson = Number(tour.price);
+    const groupSize = Number(item.groupSize);
+    const tourTotalPrice = pricePerPerson * groupSize;
     tours.push({
       tour: tour._id,
-      groupSize: item.groupSize,
-      price: item.totalPrice // or item.price if per-person
+      groupSize,
+      pricePerPerson,
+      tourTotalPrice
     });
-    totalPrice += item.totalPrice;
+    bookingTotalPrice += item.totalPrice;
   } 
 
   const booking = await Booking.create({
     user: user._id,
     tours,
-    totalPrice,
+    bookingTotalPrice,
     // coupon: cart.coupon, // if you have coupon logic
     // status: 'pending' // default
   });

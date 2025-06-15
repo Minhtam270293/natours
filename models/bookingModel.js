@@ -16,7 +16,7 @@ const bookingTourSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  totalPrice: { // pricePerPerson * groupSize
+  tourTotalPrice : { // pricePerPerson * groupSize
     type: Number,
     required: true,
     min: 0
@@ -36,7 +36,7 @@ const bookingSchema = new mongoose.Schema({
     default: 'pending'
   },
   coupon: String,
-  totalPrice: { // Sum of all tour totalPrices, minus coupon if any
+  bookingTotalPrice : { // Sum of all tour totalPrices, minus coupon if any
     type: Number,
     required: true,
     min: 0
