@@ -211,11 +211,11 @@ controller.webhookCheckout = async (req, res) => {
     const bookingId = session.metadata.bookingId;
 
     try {
-      await updateBookingStatus(bookingId, 'paid');
+      await controller.updateBookingStatus(bookingId, 'paid');
 
     } catch (err) {
 
-      return res.status(500).json({ status: 'error', message: 'Failed to create bookings from Stripe session' });
+      return res.status(500).json({ status: 'error', message: 'Failed to update booking status from Stripe session' });
     }
   }
 
