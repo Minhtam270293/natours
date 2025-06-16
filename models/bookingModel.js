@@ -15,7 +15,9 @@ const bookingTourSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
-  }
+  },
+  name: { type: String, required: true },
+  imageCover: { type: String, required: true }
 });
 
 const bookingSchema = new mongoose.Schema({

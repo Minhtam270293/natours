@@ -77,7 +77,9 @@ const createBookingFromCart = async (user, cart) => {
     tours.push({
       tour: tour._id,
       groupSize,
-      tourTotalPrice
+      tourTotalPrice,
+      name: tour.name,
+      imageCover: tour.imageCover
     });
     bookingTotalPrice += tourTotalPrice;
   } 
@@ -99,34 +101,23 @@ const createBookingFromCart = async (user, cart) => {
 
 controller.createStripeSession = async (req, res) => {
   try {
+    // 1. Create the booking from the cart
     const booking = await createBookingFromCart(req.user, req.session.cart);
 
-    // Fetch all tour details for the tours in the booking
-    const tourIds = booking.tours.map(t => t.tour);
-    const tours = await Tour.find({ _id: { $in: tourIds } });
-
-    // Build a map for quick lookup
-    const tourMap = {};
-    tours.forEach(tour => {
-      tourMap[tour._id.toString()] = tour;
-    });
-
-    // Build line items for Stripe
-    const lineItems = booking.tours.map(tourItem => {
-      const tour = tourMap[tourItem.tour.toString()];
-      return {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: tour.name,
-            images: [`${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`],
-          },
-          unit_amount: Math.round(tourItem.pricePerPerson * 100),
+    // 2. Build Stripe line items directly from booking.tours
+    const lineItems = booking.tours.map(tourItem => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: tourItem.name,
+          images: [`${req.protocol}://${req.get('host')}/img/tours/${tourItem.imageCover}`],
         },
-        quantity: tourItem.groupSize,
-      };
-    });
+        unit_amount: Math.round((tourItem.tourTotalPrice / tourItem.groupSize) * 100),
+      },
+      quantity: tourItem.groupSize,
+    }));
 
+    // 3. Create the Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: req.user.email,
@@ -139,6 +130,7 @@ controller.createStripeSession = async (req, res) => {
       }
     });
 
+    // 4. Respond with the session ID
     res.status(200).json({ id: session.id });
   } catch (err) {
     console.error('❌ Stripe error:', err);
