@@ -17,7 +17,8 @@ const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const cartRouter = require('./routes/cartRoutes');
 const viewRouter = require('./routes/viewRoutes');
-const promotionRouter = require('./routes/promotionRoutes');
+const promoRouter = require('./routes/promoRoutes');
+
 
 const cartController = require('./controllers/cartController')
 
@@ -125,12 +126,12 @@ app.use((req, res, next) => {
 
 // 3) ROUTES
 
-app.use('/', viewRouter)
+app.use('/', viewRouter);
+app.use('/promos', promoRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/carts', cartRouter);
-app.use('/api/v1/promotions', promotionRouter);
 
 
 app.all('*', (req, res, next) => {
