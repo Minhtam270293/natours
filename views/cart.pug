@@ -45,6 +45,19 @@ block content
                     )
 
 
+    // Promo code UI mockup (static example, not dynamic)
+    .promo-section
+      label
+        input(
+          type='checkbox', 
+          id='promo-checkbox',
+          checked=cart.promoCode === promo.code
+          )
+        |  #{promo.title} (Code: #{promo.code})
+        span.promo-remaining(style='margin-left:1rem; color:#888; font-size:1.6rem;')
+          | Remaining: #{promo.remaining}
+
+
     .data-summary
       p Subtotal: $#{cart.subtotal}
       p Coupon: $#{cart.discount}

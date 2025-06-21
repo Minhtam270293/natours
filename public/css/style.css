@@ -1407,6 +1407,16 @@ body {
   color: #555;
 }
 
+.promo-section {
+  background-color: #f7f7f7;
+  padding: 2rem;
+  border-radius: 10px;
+  font-size: 1.6rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.05);
+  color: #555;
+}
+
 .data-summary p {
   margin: 0.5rem 0;
 }

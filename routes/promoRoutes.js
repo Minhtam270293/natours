@@ -4,4 +4,4 @@ const promoController = require('../controllers/promoController')
 
 const router = express.Router();
 
-router.get('/active', promoController.getActivePromo);
+// router.get('/active', promoController.getActivePromo);

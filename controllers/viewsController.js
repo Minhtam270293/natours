@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const promoRedis = require('../utils/redis/promo');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection
@@ -41,12 +42,13 @@ exports.getLoginForm = (req, res) => {
   });
 };
 
-exports.viewCart = (req, res) => {
-
+exports.viewCart = async (req, res) => {
+  const promo = await promoRedis.getPromo('SUMMER50');
   res.locals.cart = req.session.cart.getCart();
 
   res.status(200).render('cart', {
     title: 'Cart details',
+    promo
   });
 };
 

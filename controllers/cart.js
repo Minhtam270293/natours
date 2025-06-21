@@ -4,9 +4,9 @@ class Cart {
     constructor(oldCart) {
         this.items = oldCart.items || {};
         this.shipping = oldCart.shipping || 0;
-        this.discount = oldCart.discount || 0;
+        this.discountPercent = oldCart.discountPercent || 0;
 
-        this.couponCode = oldCart.couponCode || '';
+        this.promoCode = oldCart.promoCode || '';
         this.paymentMethod = oldCart.paymentMethod || 'COD';
         this.shippingAddress = oldCart.shippingAddress || '';
     }
@@ -26,6 +26,11 @@ class Cart {
             price += parseFloat(this.items[id].totalPrice);
         }
         return parseFloat(price).toFixed(2);
+    }
+
+    get discount() {
+        let price = parseFloat(this.subtotal) * (this.discountPercent / 100);
+        return price;
     }
 
     get total() {
@@ -89,9 +94,9 @@ class Cart {
 
     clear() {
         this.items = {};
-        this.discount = 0;
         this.shipping = 0;
-        this.couponCode = '';
+        this.promoCode = '';
+        this.discountPercent = 0;
     };
 
     #generateArray() {
@@ -112,7 +117,8 @@ class Cart {
             total: this.total,
             shipping: parseFloat(this.shipping).toFixed(2),
             discount: parseFloat(this.discount).toFixed(2),
-            couponCode: this.couponCode,
+            discountPercent: parseFloat(this.discountPercent).toFixed(2),
+            promoCode: this.promoCode,
             paymentMethod: this.paymentMethod,
             shippingAddress: this.shippingAddress
         }

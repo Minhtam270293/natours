@@ -81,8 +81,8 @@ const createBookingFromCart = async (user, cart) => {
       name: tour.name,
       imageCover: tour.imageCover
     });
-    bookingTotalPrice += tourTotalPrice;
   } 
+  bookingTotalPrice = Number(cart.subtotal);
 
   const booking = await Booking.create({
     user: user._id,
@@ -153,11 +153,11 @@ controller.updateGroupSize = (req, res, next) => {
 
   // Update group size
   const updatedItem = req.session.cart.updateTourSize(id, parseInt(orderSize));
-
-  return res.status(200).json({
+  
+  res.status(200).json({
     updatedItemTotal: updatedItem.totalPrice,
     subtotal: req.session.cart.subtotal,
-    discount: req.session.cart.discount,
+    discount: req.session.cart.discount.toFixed(2),
     total: req.session.cart.total
   });
 };

@@ -7,47 +7,62 @@ exports.createSamplePromo = async function() {
       code: 'SUMMER50',
       discountPercent: 50,
       title: '🔥 50% off all tours!',
-      expiresAt: Date.now() + 10 * 60 * 1000
     },
-    ttl: 10 * 60,
-    initialUses: 1000
+    initialUses: 10
   };
 
   await promoRedis.setPromo(
     promo.code,
     promo.promoDetails,
-    promo.ttl,
     promo.initialUses
   );
   console.log('Sample promo created!');
 };
 
-exports.getActivePromo = async (req, res) => {
+exports.getActivePromo = async (req, res, next) => {
   // Optionally, fetch the active promo code from config or Redis
   const promo = await promoRedis.getPromo('SUMMER50'); // Replace with dynamic code if needed
   if (!promo) return res.status(204).send();
   res.json(promo);
 };
 
-exports.applyPromo = async (req, res) => {
+exports.applyPromo = async (req, res, next) => {
   const { promoCode } = req.body;
-  const promo = await promoRedis.getPromo(promoCode);
-  if (!promo) return res.status(410).json({ message: 'Promo expired' });
+  if (!req.session.cart) return res.status(400).json({ message: 'Cart not found' });
 
-  const remaining = await promoRedis.decrRemaining(promoCode);
-  if (remaining < 0) {
-    await promoRedis.incrRemaining(promoCode);
+  const promo = await promoRedis.getPromo(promoCode);
+  if (!promo) return res.status(410).json({ message: 'Promo expired or invalid' });
+
+  const remaining = await promoRedis.getRemaining(promoCode);
+  if (!remaining || remaining <= 0) {
     return res.status(429).json({ message: 'Promo limit reached' });
   }
 
-  if (!req.session.cart) req.session.cart = {};
-  req.session.cart.promo = promoCode;
-  res.json({ success: true, discount: promo.discountPercent });
+  req.session.cart.promoCode = promoCode;
+  req.session.cart.discountPercent = promo.discountPercent;
+
+  return res.json({
+    subtotal: req.session.cart.subtotal,
+    discount: req.session.cart.discount.toFixed(2),
+    total: req.session.cart.total
+  });
 };
 
-exports.removePromo = async (req, res) => {
+exports.removePromo = async (req, res, next) => {
   const { promoCode } = req.body;
-  await promoRedis.incrRemaining(promoCode);
-  if (req.session.cart) delete req.session.cart.promo;
-  res.json({ success: true });
+ 
+  if (!req.session.cart) return res.status(400).json({ message: 'Cart not found' });
+
+  if (!req.session.cart.promoCode || req.session.cart.promoCode !== promoCode) {
+    return res.status(400).json({ message: 'No promo code applied or code mismatch' });
+  }
+
+  req.session.cart.promoCode = '';
+  req.session.cart.discount = 0;
+
+  res.json({
+    subtotal: req.session.cart.subtotal,
+    discount: req.session.cart.discount.toFixed(2),
+    total: req.session.cart.total
+  });
 };

@@ -4,6 +4,7 @@ document.querySelectorAll('.group-size-form').forEach(form => {
   const decreaseBtn = form.querySelector('.decrease');
   const increaseBtn = form.querySelector('.increase');
 
+
   const updateGroupSize = async (newSize) => {
     try {
       const res = await axios.post('/api/v1/carts/update', {
@@ -61,3 +62,31 @@ document.querySelectorAll('.group-size-form').forEach(form => {
     }
   });
 });
+
+// --- Promo checkbox logic ---
+const promoCheckbox = document.getElementById('promo-checkbox');
+if (promoCheckbox) {
+  promoCheckbox.addEventListener('change', async function () {
+    try {
+      let res;
+      if (promoCheckbox.checked) {
+        res = await axios.post('/cart/apply-promo', { promoCode: 'SUMMER50' });
+      } else {
+        res = await axios.post('/cart/remove-promo', { promoCode: 'SUMMER50' });
+      }
+      const data = res.data;
+      // Update summary
+      const summary = document.querySelector('.data-summary');
+      if (summary) {
+        summary.innerHTML = `
+          <p>Subtotal: $${data.subtotal}</p>
+          <p>Coupon: $${data.discount}</p>
+          <p class="data-total">Grand Total: $${data.total}</p>
+        `;
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error updating promo');
+      promoCheckbox.checked = !promoCheckbox.checked; // revert if error
+    }
+  });
+}
