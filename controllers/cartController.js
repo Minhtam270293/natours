@@ -4,6 +4,7 @@ const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const mongoose = require('mongoose');
+const promoRedis = require('../utils/redis/promo');
 
 
 let controller = {};
@@ -88,9 +89,13 @@ const createBookingFromCart = async (user, cart) => {
     user: user._id,
     tours,
     bookingTotalPrice,
-    // coupon: cart.coupon, // if you have coupon logic
-    // status: 'pending' // default
+    coupon: cart.promoCode || undefined // store the promo code if used
   });
+
+  // Reserve promo usage if a promo code was used
+  if (cart.promoCode) {
+    await promoRedis.reservePromoForOrder(cart.promoCode, booking._id.toString());
+  }
 
   for (const item of booking.tours) {
     await updateTourSlots(item.tour, item.groupSize);
