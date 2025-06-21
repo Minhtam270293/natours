@@ -70,9 +70,9 @@ if (promoCheckbox) {
     try {
       let res;
       if (promoCheckbox.checked) {
-        res = await axios.post('/cart/apply-promo', { promoCode: 'SUMMER50' });
+        res = await axios.post('/api/v1/carts/apply-promo', { promoCode: 'SUMMER50' });
       } else {
-        res = await axios.post('/cart/remove-promo', { promoCode: 'SUMMER50' });
+        res = await axios.post('/api/v1/carts/remove-promo', { promoCode: 'SUMMER50' });
       }
       const data = res.data;
       // Update summary

@@ -44,11 +44,13 @@ exports.getLoginForm = (req, res) => {
 
 exports.viewCart = async (req, res) => {
   const promo = await promoRedis.getPromo('SUMMER50');
+  const promoCodeRemaining = await promoRedis.getRemaining('SUMMER50');
   res.locals.cart = req.session.cart.getCart();
 
   res.status(200).render('cart', {
     title: 'Cart details',
-    promo
+    promo,
+    promoCodeRemaining
   });
 };
 

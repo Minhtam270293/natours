@@ -58,7 +58,7 @@ exports.removePromo = async (req, res, next) => {
   }
 
   req.session.cart.promoCode = '';
-  req.session.cart.discount = 0;
+  req.session.cart.discountPercent = 0;
 
   res.json({
     subtotal: req.session.cart.subtotal,

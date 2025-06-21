@@ -82,7 +82,7 @@ const createBookingFromCart = async (user, cart) => {
       imageCover: tour.imageCover
     });
   } 
-  bookingTotalPrice = Number(cart.subtotal);
+  bookingTotalPrice = Number(cart.total);
 
   const booking = await Booking.create({
     user: user._id,
