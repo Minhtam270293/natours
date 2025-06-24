@@ -6,12 +6,10 @@ const Booking = require('../models/bookingModel');
 const mongoose = require('mongoose');
 const promoRedis = require('../utils/redis/promo');
 
-
-let controller = {};
-
-controller.add = async (req, res, next) => {
-    const id = req.body.id;
-    const orderSize = isNaN(req.body.orderSize) ? 1 : parseInt(req.body.orderSize);
+// Add a tour to the cart
+exports.add = async (req, res, next) => {
+  const id = req.body.id;
+  const orderSize = isNaN(req.body.orderSize) ? 1 : parseInt(req.body.orderSize);
 
     try {
         const tour = await Tour.findById(id);
@@ -33,12 +31,12 @@ controller.add = async (req, res, next) => {
     }
 };
 
-controller.remove = (req, res) => {
+exports.remove = (req, res) => {
   req.session.cart.remove(req.body.id);
   return res.redirect('/cart');
 };
 
-controller.clear = (req, res) => {
+exports.clear = (req, res) => {
   req.session.cart.clear();
   return res.redirect('/cart');
 };
@@ -104,7 +102,7 @@ const createBookingFromCart = async (user, cart) => {
   return booking;
 };
 
-controller.createStripeSession = async (req, res) => {
+exports.createStripeSession = async (req, res) => {
   try {
     // 1. Create the booking from the cart
     const booking = await createBookingFromCart(req.user, req.session.cart);
@@ -143,7 +141,7 @@ controller.createStripeSession = async (req, res) => {
   }
 };
 
-controller.updateGroupSize = (req, res, next) => {
+exports.updateGroupSize = (req, res, next) => {
   const { id, orderSize } = req.body;
 
   if (!id || !orderSize || orderSize < 1) {
@@ -169,7 +167,7 @@ controller.updateGroupSize = (req, res, next) => {
 
 
 
-controller.restoreSlotsForBooking = async (bookingId) => {
+const restoreSlotsForBooking = async (bookingId) => {
   const booking = await Booking.findById(bookingId);
   if (!booking) return;
 
@@ -182,7 +180,7 @@ controller.restoreSlotsForBooking = async (bookingId) => {
   }
 };
 
-controller.updateBookingStatus = async (bookingId, status) => {
+exports.updateBookingStatus = async (bookingId, status) => {
   const booking = await Booking.findByIdAndUpdate(
     bookingId,
     { status },
@@ -195,7 +193,8 @@ controller.updateBookingStatus = async (bookingId, status) => {
   return booking;
 };
 
-controller.webhookCheckout = async (req, res) => {
+exports.webhookCheckout = async (req, res) => {
+  // Stripe webhook received
   console.log('Stripe webhook received');
   const sig = req.headers['stripe-signature'];
   let event;
@@ -214,17 +213,31 @@ controller.webhookCheckout = async (req, res) => {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const bookingId = session.metadata.bookingId;
-
     try {
-      await controller.updateBookingStatus(bookingId, 'paid');
-
+      await exports.updateBookingStatus(bookingId, 'paid');
     } catch (err) {
-
       return res.status(500).json({ status: 'error', message: 'Failed to update booking status from Stripe session' });
+    }
+  }
+
+  // Handle payment cancelled event
+  if (event.type === 'checkout.session.expired' || event.type === 'checkout.session.async_payment_failed') {
+    const session = event.data.object;
+    const bookingId = session.metadata.bookingId;
+    try {
+      // 1. Set booking status to cancelled
+      await exports.updateBookingStatus(bookingId, 'cancelled');
+      // 2. Rollback promo reservation if promo was used
+      const booking = await Booking.findById(bookingId);
+      if (booking && booking.coupon) {
+        await promoRedis.rollbackPromoReservation(booking.coupon, bookingId);
+      }
+      // 3. Restore tour slots
+      await exports.restoreSlotsForBooking(bookingId);
+    } catch (err) {
+      return res.status(500).json({ status: 'error', message: 'Failed to rollback after payment cancel/expire' });
     }
   }
 
   res.status(200).json({ received: true });
 };
-
-module.exports = controller;

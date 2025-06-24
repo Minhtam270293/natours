@@ -5,7 +5,7 @@ exports.createSamplePromo = async function() {
     code: 'SUMMER50',
     discountPercent: 50,
     title: '🔥 50% off all tours!',
-    totalUses: 10
+    totalUses: 3
   };
   await promoRedis.setPromo(promo.code, promo);
   console.log('Sample promo created!');
