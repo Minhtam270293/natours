@@ -3,19 +3,11 @@ const promoRedis = require('../utils/redis/promo');
 exports.createSamplePromo = async function() {
   const promo = {
     code: 'SUMMER50',
-    promoDetails: {
-      code: 'SUMMER50',
-      discountPercent: 50,
-      title: '🔥 50% off all tours!',
-    },
-    initialUses: 10
+    discountPercent: 50,
+    title: '🔥 50% off all tours!',
+    totalUses: 10
   };
-
-  await promoRedis.setPromo(
-    promo.code,
-    promo.promoDetails,
-    promo.initialUses
-  );
+  await promoRedis.setPromo(promo.code, promo);
   console.log('Sample promo created!');
 };
 
