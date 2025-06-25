@@ -98,8 +98,10 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
 });
 
 exports.viewBooking = async (req, res) => {
-
-  const bookings = await Booking.find({ user: req.user.id }).populate('tours.tour');
+  // Fetch bookings for the user, sorted by most recent first
+  const bookings = await Booking.find({ user: req.user.id })
+    .populate('tours.tour')
+    .sort({ createdAt: -1 });
 
   res.status(200).render('booking', {
     title: 'My bookings',
