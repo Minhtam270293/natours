@@ -110,7 +110,11 @@ exports.viewBooking = async (req, res) => {
 };
 
 exports.viewAllBookings = async (req, res) => {
-  const bookings = await Booking.find().populate('user').populate('tours.tour');
+  const bookings = await Booking.find()
+  .populate('user')
+  .populate('tours.tour')
+  .sort({ createdAt: -1 });
+  
   res.status(200).render('allBookings', {
     title: 'Manage All Bookings',
     bookings

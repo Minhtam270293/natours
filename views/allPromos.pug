@@ -1,0 +1,31 @@
+extends base
+
+block content
+  h2.heading-secondary.ma-bt-md ALL PROMOTION CAMPAIGNS
+
+  if promos.length
+    table.data-table
+      thead
+        tr
+          th Promo Code
+          th Discount %
+          th Title
+          th Total Uses
+          th Remaining
+          th Actions
+      tbody
+        each promo in promos
+          tr
+            td= promo.code
+            td= promo.discountPercent
+            td= promo.title
+            td= promo.totalUses
+            td= promo.remaining
+            td
+              a.btn.btn--small.btn--green(href=`/promos/${promo.code}/edit`) Edit
+              button.btn.btn--small.btn--delete-promo(
+                type='button',
+                data-promocode=`${promo.code}`
+              ) Delete
+  else
+    h2.heading-secondary.ma-bt-md NO PROMOTION CAMPAIGNS FOUND
