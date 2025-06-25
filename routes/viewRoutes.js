@@ -21,6 +21,7 @@ router.get(
 router.get('/bookings', authController.protect, authController.restrictTo('admin'), viewsController.viewAllBookings)
 router.get('/users', authController.protect, authController.restrictTo('admin'), viewsController.viewAllUsers)
 router.get('/users/:id/edit', authController.protect, authController.restrictTo('admin'), viewsController.viewEditUser)
+router.get('/promotions', authController.protect, authController.restrictTo('admin'), viewsController.viewAllPromotions)
 
 
 router.post(
