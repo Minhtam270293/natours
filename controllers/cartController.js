@@ -107,6 +107,9 @@ exports.createStripeSession = async (req, res) => {
     // 1. Create the booking from the cart
     const booking = await createBookingFromCart(req.user, req.session.cart);
 
+    // Store booking ID in session for cancel handling
+    req.session.booking = { id: booking._id.toString() };
+
     // 2. Build Stripe line items directly from booking.tours
     const lineItems = booking.tours.map(tourItem => ({
       price_data: {
@@ -240,4 +243,35 @@ exports.webhookCheckout = async (req, res) => {
   }
 
   res.status(200).json({ received: true });
+};
+
+exports.handleCheckoutCancel = async (req, res, next) => {
+  const bookingId = req.session.booking && req.session.booking.id;  
+  if (bookingId) {
+    try {
+      const booking = await Booking.findById(bookingId);
+      if (!booking) return next();
+
+      // Only cancel if still pending
+      if (booking.status === 'pending') {
+        // 1. Update booking status which also restores tour slots
+        await exports.updateBookingStatus(bookingId, 'cancelled');
+        
+        // 2. Rollback promo reservation if used
+        if (booking.coupon) {
+          await promoRedis.rollbackPromoReservation(booking.coupon, bookingId);
+        }
+
+        // 3. Clear cart
+        req.session.cart.clear();
+        // 4. Clear booking from session
+        delete req.session.booking;
+      }
+    } catch (err) {
+      // Log error but continue to render page
+      // Webhook will handle cleanup if this fails
+      console.error('Error in handleCheckoutCancel:', err);
+    }
+  }
+  next();
 };
