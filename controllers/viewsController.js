@@ -136,3 +136,12 @@ exports.viewEditUser = async (req, res) => {
     userToEdit
   });
 };
+
+exports.viewAllPromotions = async (req, res) => {
+  const promos = await promoRedis.getPromo('SUMMER50');
+  const promoCodeRemaining = await promoRedis.getRemaining('SUMMER50');
+  res.status(200).render('allPromos', {
+    title: 'Manage All Promotions',
+    promos: promo ? [{ ...promo, remaining: promoCodeRemaining }] : [],
+  });
+};
