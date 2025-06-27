@@ -21,9 +21,18 @@ exports.getRemaining = async function (code) {
 
 exports.reservePromoForOrder = async function (code, orderId) {
   const reserveKey = `promo:${code}:reserve`;
-  await client.rPush(reserveKey, orderId);
-  const remaining = await exports.getRemaining(code);
+
+  const multi = client.multi();
+  multi.rPush(reserveKey, orderId);
+  multi.lRange(reserveKey, 0, -1);
+
+  const [, reserveList] = await multi.exec();
+  const promo = await exports.getPromo(code);
+
+  const remaining = promo.totalUses - reserveList.length;
+
   if (remaining < 0) {
+    // Remove the orderId if over limit
     await client.lRem(reserveKey, 0, orderId);
     throw new Error('Promo limit reached');
   }
@@ -32,4 +41,15 @@ exports.reservePromoForOrder = async function (code, orderId) {
 exports.rollbackPromoReservation = async function (code, orderId) {
   const reserveKey = `promo:${code}:reserve`;
   await client.lRem(reserveKey, 0, orderId);
+};
+
+exports.updatePromo = async function (code, updatedFields) {
+  // Get the current promo
+  const promo = await exports.getPromo(code);
+  if (!promo) throw new Error('Promo not found');
+  // Update fields
+  Object.assign(promo, updatedFields);
+  // Save back to Redis
+  await exports.setPromo(code, promo);
+  return promo;
 };

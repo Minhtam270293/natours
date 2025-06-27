@@ -1,7 +1,13 @@
 const express = require('express')
 const promoController = require('../controllers/promoController')
+const authController = require('../controllers/authController')
 
 
 const router = express.Router();
 
-// router.get('/active', promoController.getActivePromo);
+router.route('/:promoCode')
+.patch(authController.protect,
+    authController.restrictTo('admin'),
+    promoController.updatePromo);
+
+module.exports = router;

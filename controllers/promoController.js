@@ -58,3 +58,18 @@ exports.removePromo = async (req, res, next) => {
     total: req.session.cart.total
   });
 };
+
+exports.updatePromo = async (req, res, next) => {
+  const { promoCode } = req.params;
+  const { discountPercent, title, totalUses } = req.body;
+
+  // Optionally: validate input here
+
+  await promoRedis.updatePromo(promoCode, {
+    discountPercent: Number(discountPercent),
+    title,
+    totalUses: Number(totalUses)
+  });
+
+  res.status(200).json({ status: 'success' });
+};

@@ -15,6 +15,7 @@ const userPasswordForm = document.querySelector('.form-user-password');
 const addToCartButton = document.querySelector('.add-to-cart');
 const checkoutForm = document.querySelector('.form--checkout')
 const userEditForm = document.querySelector('.form-user-edit');
+const promoEditForm = document.querySelector('.form-promo-edit')
 const deleteUserBtns = document.querySelectorAll('.btn--delete-user');
 
 // DELEGATION
@@ -62,6 +63,18 @@ if (userDataForm)
 
 
     updateSettings(form, 'data');
+  });
+
+if (promoEditForm)
+  promoEditForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const data = {
+      discountPercent: document.getElementById('discountPercent').value,
+      title: document.getElementById('title').value,
+      totalUses: document.getElementById('totalUses').value
+    };
+    const promoCode = document.getElementById('promoCodeToEdit').value;
+    editPromo(data, promoCode);
   });
 
 if (userEditForm)

@@ -3,14 +3,12 @@ extends base
 block content
   .user-view__content
     .user-view__form-container
-      h2.heading-secondary.ma-bt-md Edit promotion campaign
+      h2.heading-secondary.ma-bt-md Edit promotion code: #{promo.code}
       form.form.form-promo-edit
-        .form__group
-          label.form__label(for='code') Promo Code
-          input#code.form__input(type='text', value=`${promo.code}`, required, name='code')
         .form__group
           label.form__label(for='discountPercent') Discount %
           input#discountPercent.form__input(type='number', value=`${promo.discountPercent}`, required, name='discountPercent', min='0', max='100')
+          input(type='hidden', id='promoCodeToEdit', value=`${promo.code}`)
         .form__group
           label.form__label(for='title') Title
           input#title.form__input(type='text', value=`${promo.title}`, required, name='title')

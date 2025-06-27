@@ -132,6 +132,7 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/carts', cartRouter);
+app.use('/api/v1/promos', promoRouter)
 
 
 app.all('*', (req, res, next) => {

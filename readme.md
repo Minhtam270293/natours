@@ -9,7 +9,7 @@ Built using Node.js, Express, mongoDB, mongoose
   - Secure online payments with Stripe Checkout.
   - Automated, real-time payment verification and booking updates via Stripe webhooks.
 
-- **Promotion Service with Redis Caching**
+- **Redis Caching fpr Promotion Service**
 
   - Handles high-traffic promo campaigns with fast, atomic in-memory operations.
   - Prevents MongoDB bottlenecks and ensures accurate, real-time promo code validation.
@@ -25,8 +25,8 @@ Built using Node.js, Express, mongoDB, mongoose
   - Secure user authentication using JWT tokens stored in HTTP-only cookies.
   - Protects routes and ensures only authorized users can access sensitive features.
 
-- **Automated Testing**
-  - Basic automated tests using Jest for backend logic.
+- **Basic Automated Testing**
+  - Using Jest to test backend logic and APIs.
   - Selenium-based tests for end-to-end user flows.
 
 ---

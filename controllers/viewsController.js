@@ -137,11 +137,19 @@ exports.viewEditUser = async (req, res) => {
   });
 };
 
-exports.viewAllPromotions = async (req, res) => {
-  const promos = await promoRedis.getPromo('SUMMER50');
+exports.viewAllPromos = async (req, res) => {
+  const promo = await promoRedis.getPromo('SUMMER50');
   const promoCodeRemaining = await promoRedis.getRemaining('SUMMER50');
   res.status(200).render('allPromos', {
     title: 'Manage All Promotions',
     promos: promo ? [{ ...promo, remaining: promoCodeRemaining }] : [],
+  });
+};
+
+exports.viewEditPromo = async (req, res) => {
+  const promo = await promoRedis.getPromo(req.params.promoCode);
+  res.status(200).render('editPromo', {
+    title: 'Edit promotion',
+    promo
   });
 };
