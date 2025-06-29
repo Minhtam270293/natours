@@ -4,6 +4,7 @@ const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const promoRedis = require('../utils/redis/promo');
+const promoController = require('../controllers/promoController');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection
@@ -138,11 +139,17 @@ exports.viewEditUser = async (req, res) => {
 };
 
 exports.viewAllPromos = async (req, res) => {
-  const promo = await promoRedis.getPromo('SUMMER50');
-  const promoCodeRemaining = await promoRedis.getRemaining('SUMMER50');
+  const promos = await promoRedis.getAllPromos();
+
+  const promosWithRemaining = await Promise.all(
+    promos.map(async promo => ({
+      ...promo,
+      remaining: await promoRedis.getRemaining(promo.code)
+    }))
+  );
   res.status(200).render('allPromos', {
     title: 'Manage All Promotions',
-    promos: promo ? [{ ...promo, remaining: promoCodeRemaining }] : [],
+    promos: promosWithRemaining
   });
 };
 

@@ -1,6 +1,6 @@
 const promoRedis = require('../utils/redis/promo');
 
-exports.createSamplePromo = async function() {
+exports.createPromo = async function() {
   const promo = {
     code: 'SUMMER50',
     discountPercent: 50,
@@ -8,10 +8,10 @@ exports.createSamplePromo = async function() {
     totalUses: 3
   };
   await promoRedis.setPromo(promo.code, promo);
-  console.log('Sample promo created!');
+  console.log('Promo created!');
 };
 
-exports.getAllPromo = async (req, res, next) => {
+exports.getAllPromos = async (req, res, next) => {
   // Optionally, fetch the active promo code from config or Redis
   const promos = await promoRedis.getAllPromos(); // Replace with dynamic code if needed
   res.status(200).json({ status: 'success', data: { promos } });

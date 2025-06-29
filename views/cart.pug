@@ -3,7 +3,7 @@ extends base
 block content
 
 
-  if cart.items.length
+  if cart.items && cart.items.length
     h2.heading-secondary.ma-bt-md YOUR CART
     table.data-table
       thead
@@ -45,17 +45,21 @@ block content
                     )
 
 
-    // Promo code UI mockup (static example, not dynamic)
+    // Promo code UI
     .promo-section
-      label
-        input(
-          type='checkbox', 
-          id='promo-checkbox',
-          checked=cart.promoCode === promo.code
-          )
-        |  #{promo.title} (Code: #{promo.code})
-        span.promo-remaining(style='margin-left:1rem; color:#888; font-size:1.6rem;')
-          | Remaining: #{promoCodeRemaining}
+      if promos && promos.length
+        each promo in promos
+          label
+            input(
+              type='checkbox',
+              name='promo-checkbox',
+              checked=cart.promoCode === promo.code
+            )
+            | #{promo.title} (Code: #{promo.code})
+            span.promo-remaining(style='margin-left:1rem; color:#888; font-size:1.6rem;')
+              | Remaining: #{promo.remaining}
+      else
+        p(style='color:#888;') No promotions available at this time.
 
 
     .data-summary

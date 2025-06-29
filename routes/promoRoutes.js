@@ -5,7 +5,7 @@ const authController = require('../controllers/authController')
 
 const router = express.Router();
 
-route.route('/').get(promoController.getAllPromos);
+// route.route('/').get(promoController.getAllPromos);
 
 router.route('/:promoCode')
 .patch(authController.protect,
