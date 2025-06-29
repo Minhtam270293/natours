@@ -11,11 +11,10 @@ exports.createSamplePromo = async function() {
   console.log('Sample promo created!');
 };
 
-exports.getActivePromo = async (req, res, next) => {
+exports.getAllPromo = async (req, res, next) => {
   // Optionally, fetch the active promo code from config or Redis
-  const promo = await promoRedis.getPromo('SUMMER50'); // Replace with dynamic code if needed
-  if (!promo) return res.status(204).send();
-  res.json(promo);
+  const promos = await promoRedis.getAllPromos(); // Replace with dynamic code if needed
+  res.status(200).json({ status: 'success', data: { promos } });
 };
 
 exports.applyPromo = async (req, res, next) => {

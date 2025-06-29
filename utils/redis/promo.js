@@ -1,5 +1,17 @@
 const client = require('./client');
 
+exports.getAllPromo = async function() {
+  const keys = await client.keys('promo:*');
+  const promoKeys = keys.filter(key => !key.endsWith(':reserve'));
+  const promos = await Promise.all(
+    promoKeys.map(async key => {
+      const data = await client.get(key);
+      return data ? JSON.parse(data) : null;
+    })
+  )
+  return promos.filter(Boolean);
+}
+
 exports.getPromo = async function (code) {
   const data = await client.get(`promo:${code}`);
   return data ? JSON.parse(data) : null;
