@@ -9,7 +9,7 @@ Built using Node.js, Express, mongoDB, mongoose
   - Secure online payments with Stripe Checkout.
   - Automated, real-time payment verification and booking updates via Stripe webhooks.
 
-- **Redis Caching fpr Promotion Service**
+- **Redis Caching for Promotion Service**
 
   - Handles high-traffic promo campaigns with fast, atomic in-memory operations.
   - Prevents MongoDB bottlenecks and ensures accurate, real-time promo code validation.
