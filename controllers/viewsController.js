@@ -44,14 +44,20 @@ exports.getLoginForm = (req, res) => {
 };
 
 exports.viewCart = async (req, res) => {
-  const promo = await promoRedis.getPromo('SUMMER50');
-  const promoCodeRemaining = await promoRedis.getRemaining('SUMMER50');
+  // Get all promos and their remaining uses
+  const promos = await promoRedis.getAllPromos();
+  const promosWithRemaining = await Promise.all(
+    promos.map(async promo => ({
+      ...promo,
+      remaining: await promoRedis.getRemaining(promo.code)
+    }))
+  );
   res.locals.cart = req.session.cart.getCart();
 
   res.status(200).render('cart', {
     title: 'Cart details',
-    promo,
-    promoCodeRemaining
+    promos: promosWithRemaining,
+    cart: res.locals.cart
   });
 };
 
@@ -158,5 +164,11 @@ exports.viewEditPromo = async (req, res) => {
   res.status(200).render('editPromo', {
     title: 'Edit promotion',
     promo
+  });
+};
+
+exports.viewCreatePromo = async (req, res) => {
+  res.status(200).render('createPromo', {
+    title: 'Create a new promotion',
   });
 };

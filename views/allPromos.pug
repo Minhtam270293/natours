@@ -3,6 +3,10 @@ extends base
 block content
   h2.heading-secondary.ma-bt-md ALL PROMOTION CAMPAIGNS
 
+  div(style='margin-bottom:2rem;')
+    a.btn.btn--small.btn--green(href='/promos/create') Create Promotion
+
+
   if promos.length
     table.data-table
       thead

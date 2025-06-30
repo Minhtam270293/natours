@@ -23,6 +23,7 @@ router.get('/users', authController.protect, authController.restrictTo('admin'),
 router.get('/users/:id/edit', authController.protect, authController.restrictTo('admin'), viewsController.viewEditUser)
 router.get('/promos', authController.protect, authController.restrictTo('admin'), viewsController.viewAllPromos)
 router.get('/promos/:promoCode/edit', authController.protect, authController.restrictTo('admin'), viewsController.viewEditPromo)
+router.get('/promos/create', authController.protect, authController.restrictTo('admin'), viewsController.viewCreatePromo);
 
 
 router.post(

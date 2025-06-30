@@ -1,14 +1,17 @@
 const promoRedis = require('../utils/redis/promo');
 
-exports.createPromo = async function() {
+exports.createPromo = async function(code, discountPercent, title, totalUses) {
+  if (!code || !discountPercent || !title || !totalUses) {
+    throw new Error('All fields are required.');
+  }
   const promo = {
-    code: 'SUMMER50',
-    discountPercent: 50,
-    title: '🔥 50% off all tours!',
-    totalUses: 3
+    code,
+    discountPercent: Number(discountPercent),
+    title,
+    totalUses: Number(totalUses)
   };
   await promoRedis.setPromo(promo.code, promo);
-  console.log('Promo created!');
+  return promo;
 };
 
 exports.getAllPromos = async (req, res, next) => {

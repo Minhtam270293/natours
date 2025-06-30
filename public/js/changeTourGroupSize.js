@@ -64,15 +64,16 @@ document.querySelectorAll('.group-size-form').forEach(form => {
 });
 
 // --- Promo checkbox logic ---
-const promoCheckbox = document.getElementById('promo-checkbox');
+const promoCheckbox = document.querySelector('.promo-checkbox');
 if (promoCheckbox) {
   promoCheckbox.addEventListener('change', async function () {
     try {
       let res;
+      const promoCode = promoCheckbox.getAttribute('data-code');
       if (promoCheckbox.checked) {
-        res = await axios.post('/api/v1/carts/apply-promo', { promoCode: 'SUMMER50' });
+        res = await axios.post('/api/v1/carts/apply-promo', { promoCode });
       } else {
-        res = await axios.post('/api/v1/carts/remove-promo', { promoCode: 'SUMMER50' });
+        res = await axios.post('/api/v1/carts/remove-promo', { promoCode });
       }
       const data = res.data;
       // Update summary

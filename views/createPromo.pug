@@ -1,0 +1,21 @@
+extends base
+
+block content
+  .user-view__content
+    .user-view__form-container
+      h2.heading-secondary.ma-bt-md Create new promotion
+      form.form.form-promo-create
+        .form__group
+          label.form__label(for='code') Promo Code
+          input#code.form__input(type='text', required, name='code')
+        .form__group
+          label.form__label(for='discountPercent') Discount %
+          input#discountPercent.form__input(type='number', required, name='discountPercent', min='0', max='100')
+        .form__group
+          label.form__label(for='title') Title
+          input#title.form__input(type='text', required, name='title')
+        .form__group
+          label.form__label(for='totalUses') Total Uses
+          input#totalUses.form__input(type='number', required, name='totalUses', min='1')
+        .form__group.right
+          button.btn.btn--small.btn--green Create Promotion
