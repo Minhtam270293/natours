@@ -63,17 +63,14 @@ document.querySelectorAll('.group-size-form').forEach(form => {
   });
 });
 
-// --- Promo checkbox logic ---
-const promoCheckbox = document.querySelector('.promo-checkbox');
-if (promoCheckbox) {
-  promoCheckbox.addEventListener('change', async function () {
+// --- Promo radio logic ---
+document.querySelectorAll('.promo-checkbox').forEach(radio => {
+  radio.addEventListener('change', async function () {
     try {
       let res;
-      const promoCode = promoCheckbox.getAttribute('data-code');
-      if (promoCheckbox.checked) {
+      const promoCode = this.getAttribute('data-code');
+      if (this.checked) {
         res = await axios.post('/api/v1/carts/apply-promo', { promoCode });
-      } else {
-        res = await axios.post('/api/v1/carts/remove-promo', { promoCode });
       }
       const data = res.data;
       // Update summary
@@ -87,7 +84,7 @@ if (promoCheckbox) {
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Error updating promo');
-      promoCheckbox.checked = !promoCheckbox.checked; // revert if error
+      this.checked = false; // revert if error
     }
   });
-}
+});

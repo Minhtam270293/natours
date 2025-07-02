@@ -9,6 +9,9 @@ const createPromo = async (data) => {
 
     if (res.data.status === 'success') {
       showAlert('success', 'Promo created successfully!');
+      setTimeout(() => {
+        window.location.assign('/promos');
+      }, 1000);
     }
   } catch (err) {
     showAlert('error', err.response.data.message);

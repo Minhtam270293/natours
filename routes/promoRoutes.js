@@ -5,7 +5,11 @@ const authController = require('../controllers/authController')
 
 const router = express.Router();
 
-router.route('/').post(authController.protect,authController.restrictTo('admin'),promoController.createPromo);
+router.route('/')
+.get(promoController.getAllPromos)
+.post(promoController.createPromo);
+// .post(authController.protect, authController.restrictTo('admin'),promoController.createPromo);
+
 
 router.route('/:promoCode')
 .patch(authController.protect,

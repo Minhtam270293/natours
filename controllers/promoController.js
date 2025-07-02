@@ -1,8 +1,9 @@
 const promoRedis = require('../utils/redis/promo');
 
-exports.createPromo = async function(code, discountPercent, title, totalUses) {
+exports.createPromo = async function(req, res, next) {
+  const { code, discountPercent, title, totalUses } = req.body;
   if (!code || !discountPercent || !title || !totalUses) {
-    throw new Error('All fields are required.');
+    return res.status(400).json({ status: 'fail', message: 'All fields are required.' });
   }
   const promo = {
     code,
@@ -11,12 +12,12 @@ exports.createPromo = async function(code, discountPercent, title, totalUses) {
     totalUses: Number(totalUses)
   };
   await promoRedis.setPromo(promo.code, promo);
-  return promo;
+  res.status(201).json({ status: 'success', data: { promo } });
 };
 
 exports.getAllPromos = async (req, res, next) => {
-  // Optionally, fetch the active promo code from config or Redis
-  const promos = await promoRedis.getAllPromos(); // Replace with dynamic code if needed
+  
+  const promos = await promoRedis.getAllPromos(); 
   res.status(200).json({ status: 'success', data: { promos } });
 };
 

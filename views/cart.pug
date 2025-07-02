@@ -48,18 +48,20 @@ block content
     // Promo code UI
     .promo-section
       if promos && promos.length
-        each promo in promos
-          label
-            input(
-              type='checkbox',
-              name='promo-checkbox',
-              class='promo-checkbox',
-              checked=cart.promoCode === promo.code,
-              data-code=promo.code
-            )
-            | #{promo.title} (Code: #{promo.code})
-            span.promo-remaining(style='margin-left:1rem; color:#888; font-size:1.6rem;')
-              | Remaining: #{promo.remaining}
+        each promo, idx in promos
+          if promo.remaining > 0
+            .promo-option(style='display: flex; align-items: center; margin-bottom: 0.7rem;')
+              label(style='display: flex; align-items: center; cursor: pointer;')
+                input(
+                  type='radio',
+                  name='promo-checkbox',
+                  class='promo-checkbox',
+                  checked=cart.promoCode === promo.code,
+                  data-code=promo.code
+                )
+                span(style='margin-left: 0.7rem;') #{promo.title} (Code: #{promo.code})
+                span.promo-remaining(style='margin-left:1rem; color:#888; font-size:1.6rem;')
+                  | Remaining: #{promo.remaining}
       else
         p(style='color:#888;') No promotions available at this time.
 
