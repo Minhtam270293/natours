@@ -9,6 +9,7 @@ const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const session = require('express-session');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -19,10 +20,10 @@ const cartRouter = require('./routes/cartRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const promoRouter = require('./routes/promoRoutes');
 
-
-const cartController = require('./controllers/cartController')
+const cartController = require('./controllers/cartController');
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -42,25 +43,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   })
 // );
 
-
 // Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 } else if (process.env.NODE_ENV === 'production') {
-
 }
 
 // Limit requests from same API
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many request from this IP, please try again in an hour!' 
-})
+  message: 'Too many request from this IP, please try again in an hour!',
+});
 
-app.use('/api' , limiter);
+app.use('/api', limiter);
 
 // Content Security Policy
-
 
 // Webhook
 app.enable('trust proxy');
@@ -68,13 +66,12 @@ app.enable('trust proxy');
 app.post(
   '/webhook-checkout',
   express.raw({ type: 'application/json' }),
-  cartController.webhookCheckout
+  cartController.webhookCheckout,
 );
-
 
 // Body parser, reading data from the body into req.body
 app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
@@ -84,29 +81,33 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Prevent parameter pollution
-app.use(hpp({
-  whitelist: [
-    'duration', 
-    'ratingsQuantity', 
-    'ratingsAverage', 
-    'maxGroupSize', 
-    'difficulty', 
-    'price']
-}));
-
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  }),
+);
 
 app.use(compression());
 
 // Session config
-app.use(session({
-  secret: 'Secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    maxAge: 20 * 60 * 1000 // 20p
-  }
-}))
+app.use(
+  session({
+    secret: 'Secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      maxAge: 20 * 60 * 1000, // 20p
+    },
+  }),
+);
 
 // Test middleware
 app.use((req, res, next) => {
@@ -122,7 +123,7 @@ app.use((req, res, next) => {
   res.locals.quantity = req.session.cart.quantity;
 
   next();
-}) 
+});
 
 // 3) ROUTES
 
@@ -131,8 +132,7 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/carts', cartRouter);
-app.use('/api/v1/promos', promoRouter)
-
+app.use('/api/v1/promos', promoRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
