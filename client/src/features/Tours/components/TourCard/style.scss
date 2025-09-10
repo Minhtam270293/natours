@@ -1,0 +1,101 @@
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin: 1rem;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+.card__header {
+  position: relative;
+  padding: 0;
+}
+.card__picture {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+.card__picture-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.card__picture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.15);
+}
+.heading-tertirary {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0.5rem 1rem;
+}
+.card__details {
+  padding: 1rem;
+  font-size: 1rem;
+  color: #444;
+}
+.card__sub-heading {
+  font-size: 1.1rem;
+  color: #2ecc71;
+  margin-bottom: 0.5rem;
+}
+.card__text {
+  margin-bottom: 0.5rem;
+}
+.card__data {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+.card__icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5rem;
+  fill: #2ecc71;
+}
+.card__footer {
+  background: #f7f7f7;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.card__footer-value {
+  font-weight: bold;
+  color: #27ae60;
+}
+.card__footer-text {
+  color: #888;
+  margin-left: 0.3rem;
+}
+.card__ratings {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+.btn--green {
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn--green:hover {
+  background: #219150;
+}
+.btn--small {
+  font-size: 0.95rem;
+  padding: 0.3rem 0.8rem;
+}

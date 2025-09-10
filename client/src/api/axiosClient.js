@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'https://natours-ngocminh-c53137e1d9a4.herokuapp.com/',
+  baseURL: 'http://localhost:3000/',
   headers: {
     'Content-Type': 'application/json',
   },

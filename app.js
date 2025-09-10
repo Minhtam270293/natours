@@ -23,7 +23,11 @@ const promoRouter = require('./routes/promoRoutes');
 const cartController = require('./controllers/cartController');
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  }),
+);
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
@@ -32,6 +36,12 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve React app at /react
+app.use('/react', express.static(path.join(__dirname, 'public/react/')));
+app.get('/react/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/react', 'index.html'));
+});
 
 // Set security HTTP headers
 // app.use(

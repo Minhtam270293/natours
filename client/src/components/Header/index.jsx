@@ -1,40 +1,44 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import './style.scss';
 
-
 function Header(props) {
+  const { user, quantity } = props;
 
-    const { user, quantity } = props;
-
-    return (
-<header className="header">
+  return (
+    <header className="header">
       <nav className="nav nav--tours">
-        <a className="nav__el" href="/">All tours</a>
+        <Link className="nav__el" to="/">
+          Home
+        </Link>
       </nav>
       <div className="header__logo">
-        <img
-          src="/img/NodeJS-favicon.png"
-          alt="Natours logo"
-        />
+        <img src="/img/NodeJS-favicon.png" alt="Natours logo" />
       </div>
       <nav className="nav nav--user">
         {user ? (
           <>
-            <a className="nav__el nav__el--logout" href="#">Log out</a>
-            <a className="nav__el" href="/me">
+            <Link className="nav__el nav__el--logout" to="#">
+              Log out
+            </Link>
+            <Link className="nav__el" to="/me">
               <img
                 className="nav__user-img"
                 src={`/img/users/${user.photo}`}
                 alt={`Photo of ${user.name}`}
               />
               <span>{user.name.split(' ')[0]}</span>
-            </a>
+            </Link>
           </>
         ) : (
           <>
-            <a className="nav__el" href="/login">Log in</a>
-            <a className="nav__el nav__el--cta" href="/signup">Sign up</a>
+            <a className="nav__el" href="/login">
+              Log in
+            </a>
+            <a className="nav__el nav__el--cta" href="/signup">
+              Sign up
+            </a>
           </>
         )}
         <a className="nav__el nav__cart" href="/cart">
@@ -43,17 +47,17 @@ function Header(props) {
         </a>
       </nav>
     </header>
-    );
+  );
 }
 
 Header.propTypes = {
   user: PropTypes.object,
-  quantity: PropTypes.number
+  quantity: PropTypes.number,
 };
 
 Header.defaultProps = {
   user: null,
-  quantity: 0
+  quantity: 0,
 };
 
 export default Header;
