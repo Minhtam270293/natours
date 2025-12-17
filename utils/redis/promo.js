@@ -32,20 +32,40 @@ exports.getRemaining = async function (code) {
 
 exports.reservePromoForOrder = async function (code, orderId) {
   const reserveKey = `promo:${code}:reserve`;
-
-  const multi = client.multi();
-  multi.rPush(reserveKey, orderId);
-  multi.lRange(reserveKey, 0, -1);
-
-  const [, reserveList] = await multi.exec();
+  let success = false;
+  let attempts = 0;
   const promo = await exports.getPromo(code);
 
-  const remaining = promo.totalUses - reserveList.length;
 
-  if (remaining < 0) {
-    // Remove the orderId if over limit
-    await client.lRem(reserveKey, 0, orderId);
-    throw new Error('Promo limit reached');
+  while (!success && attempts < 5) {
+    attempts++;
+    await client.watch(reserveKey);
+
+    const reserveList = await client.lRange(reserveKey, 0, -1);
+    if (!promo) {
+      await client.unwatch();
+      throw new Error('Promo not found');
+    }
+    const remaining = promo.totalUses - reserveList.length;
+
+    if (remaining <= 0) {
+      await client.unwatch();
+      throw new Error('Promo limit reached');
+    }
+
+    const multi = client.multi();
+    multi.rPush(reserveKey, orderId);
+
+    const execResult = await multi.exec();
+    if (execResult) {
+      // Transaction succeeded
+      success = true;
+    }
+    // else: Transaction failed due to concurrent modification, retry
+  }
+
+  if (!success) {
+    throw new Error('Could not reserve promo due to high contention. Please try again.');
   }
 };
 
