@@ -19,6 +19,7 @@ const reviewRouter = require('./routes/reviewRoutes');
 const cartRouter = require('./routes/cartRoutes');
 const viewRouter = require('./routes/viewRoutes');
 const promoRouter = require('./routes/promoRoutes');
+const workerDemoRouter = require('./routes/workerDemoRoutes');
 
 const cartController = require('./controllers/cartController');
 
@@ -136,6 +137,9 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
+
+// Worker demo routes should come before catch-all routes
+app.use('/worker-demo', workerDemoRouter);
 
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);

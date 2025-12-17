@@ -15,6 +15,9 @@ const DB = process.env.DATABASE.replace(
   process.env.DATABASE_PASSWORD,
 );
 
+// Initialize cron jobs
+const initializeCronJobs = require('./utils/cron/index');
+
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
@@ -22,7 +25,11 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('DB connection sucessful'));
+  .then(() => {
+    console.log('DB connection sucessful');
+    // Start cron jobs after database connection is established
+    // initializeCronJobs();
+  });
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {

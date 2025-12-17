@@ -1,9 +1,7 @@
 const express = require('express');
-const userController = require('./../controllers/userController');
-const authController = require('./../controllers/authController');
+const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 const cartController = require('../controllers/cartController');
-
-
 
 const router = express.Router();
 
@@ -20,10 +18,12 @@ router.post('/checkout', cartController.createStripeSession);
 
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/updateMe', 
-  userController.uploadUserPhoto, 
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
   userController.resizeUserPhoto,
-  userController.updateMe);
+  userController.updateMe,
+);
 router.delete('/deleteMe', userController.deleteMe);
 
 router.use(authController.restrictTo('admin'));
@@ -39,7 +39,8 @@ router
   .patch(
     userController.uploadUserPhoto,
     userController.resizeUserPhoto,
-    userController.updateUser)
+    userController.updateUser,
+  )
   .delete(userController.deleteUser);
 
 module.exports = router;

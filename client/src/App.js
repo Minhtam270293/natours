@@ -4,13 +4,24 @@ import logo from './logo.svg';
 import './App.css';
 import Header from './components/Header';
 import TourFeature from './features/Tours';
+import { Button } from '@mui/material';
+import { useSnackbar } from 'notistack';
 
 function App() {
   const name = 'Nguyen Minh Tam';
   const role = 'Software Developer';
+
+  const { enqueueSnackbar } = useSnackbar();
+  const showNotistack = () => {
+    enqueueSnackbar('Show noti successfully', { variant: 'success' });
+  };
+
   return (
     <>
       <Header />
+
+      <Button onClick={showNotistack}>Show notistack</Button>
+
       <Routes>
         <Route
           path="/"
